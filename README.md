@@ -1,4 +1,4 @@
-# Code for paper "Hybrid local and distributed coding in PMd/M1 provides separation and interaction of bilateral arm signals"
+# "Hybrid local and distributed coding in PMd/M1 provides separation and interaction of bilateral arm signals"
 
 ## This repository contains code for analysis and visualization, organized by figures, for the paper "Hybrid local and distributed coding in PMd/M1 provides separation and interaction of bilateral arm signals". Some simple plotting code is omitted. Some code requires iterating over sessions, which has not been included as a batch script.
 
