@@ -8,12 +8,15 @@ function [alignment, explained_a, explained_b] = ...
 %
 % INPUTS: 
 %
-% X_a - unit-separated data struct containing hemisphere, brain area,
-%             firing rate and other metrics
-%             (struct: 1 x num_units)
+% X_a - trial-separated firing rate traces for all simultaneously recorded
+%       units
+%       (cell array: num_trials x 1
+%        nested matrices: num_samples x num_units)
+%
+% X_b - same format as X_a
 %
 % same_cond - specify whether comparing trials using the same or different
-%             hands. binary
+%             hands. boolean
 %
 % num_comp - number of principle components to use. integer
 %
