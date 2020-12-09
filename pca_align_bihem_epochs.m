@@ -32,8 +32,9 @@ function [X, princ_align_self, princ_align_lr]...
 % 
 % princ_align_self - alignment across time for trials using the same hand
 %                    (struct: 1x1, fields 'rest', 'prep', 'move'
-%                     nested struct: 1x1, fields 'l_on_r' and 'r_on_l'.
-%                     nested vectors: 1 x 1000, MCCV alignment values)
+%                         nested struct: 1x1, fields 'l_on_r' and 'r_on_l'
+%                             nested vectors: 1 x 1000, MCCV alignment 
+%                                 values)
 % 
 
 

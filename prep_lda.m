@@ -18,12 +18,12 @@ function [X, Y] = prep_lda(unit_data)
 %
 % X - neural data (predictors)
 %     (struct: 1x1, fields 'l_pref' and 'r_pref'
-%      nested struct: 1x1, fields 'l_hand' and 'r_hand'
-%      nested matrices: num_trials x num_units x num_samples)
+%          nested struct: 1x1, fields 'l_hand' and 'r_hand'
+%              nested matrices: num_trials x num_units x num_samples)
 %
 % Y - target id's (classes)
 %     (struct: 1x1, fields 'l_hand' and 'r_hand'
-%      nested matrices: num_trials)
+%          nested matrices: num_trials)
 % 
 
 

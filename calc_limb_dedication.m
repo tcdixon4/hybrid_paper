@@ -32,7 +32,7 @@ function [arm_pref, modulation, mu_rest, sigma_rest, p_mod]...
 % 
 % p_mod - p-values for modulation differences
 %         (struct: 1x1, fields 'ipsi', 'contra', 'hand_discrim_rest',
-%          'd_hand'
+%              'd_hand'
 %          nested in ipsi/contra, struct: 1x1, fields 'prep', 'move'
 %              nested vector: num_units x 1, p-vals for mod above rest)
 %          hand_discrim_rest vector: num_units x 1, p-vals for mod

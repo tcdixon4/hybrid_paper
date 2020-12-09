@@ -19,17 +19,17 @@ function rt_speed_mat = create_rt_speed_mat(trials)
 
 %% rt_speed_mat column descriptions
 
-% col 1: Reach hand -       Left=0, Right=1
-% col 2: Target -           1:6
-% col 3: RT -               continuous variable
-% col 4: Speed,reach hand,rest - continuous variable, mean over 300ms
-% col 5: Speed,stat hand,rest -  continuous variable, mean over 300ms
-% col 6: Speed,reach hand,instr - continuous variable, mean over 300ms
-% col 7: Speed,stat hand,instr -  continuous variable, mean over 300ms
-% col 8: Speed,reach hand,move - continuous variable, mean over 300ms
-% col 9: Speed,stat hand,move -  continuous variable, mean over 300ms
-% col 10: Reach duration -  continuous variable, move->target entry
-% col 11: Reach duration -  continuous variable, move->stop
+% col 1: Reach hand -              Left=0, Right=1
+% col 2: Target -                  1:6
+% col 3: RT -                      continuous variable
+% col 4: Speed,reach hand,rest -   continuous variable, mean over 300ms
+% col 5: Speed,stat hand,rest -    continuous variable, mean over 300ms
+% col 6: Speed,reach hand,instr -  continuous variable, mean over 300ms
+% col 7: Speed,stat hand,instr -   continuous variable, mean over 300ms
+% col 8: Speed,reach hand,move -   continuous variable, mean over 300ms
+% col 9: Speed,stat hand,move -    continuous variable, mean over 300ms
+% col 10: Reach duration -         continuous variable, move->target entry
+% col 11: Reach duration -         continuous variable, move->stop
 % col 12: Minimum movement speed - continuous variable
 
 

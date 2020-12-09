@@ -18,7 +18,8 @@ function [alignment, explained_a, explained_b] = ...
 %             hands. 
 %             (boolean)
 %
-% num_comp - number of principle components to use. integer
+% num_comp - number of principle components to use. 
+%            (integer)
 %
 % iterations - number of iterations for the Monte Carlo cross-validation  
 %              protoco. this method is stochastic for both within and  

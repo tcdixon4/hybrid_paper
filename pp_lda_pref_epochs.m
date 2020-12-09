@@ -1,6 +1,34 @@
 % Master script for time varying LDA analyses on the PP datasets
 function [Y, Y_pred] = pp_lda_pref_epochs(unit_data)
 
+%
+% Computes cross-validated target predictions using LDA. This version makes
+% independent predictions for each phase using the mean firing rate of each
+% unit over the respective phase window. 
+%
+%
+% INPUTS: 
+%
+% unit_data - unit-separated data struct containing hemisphere, brain area,
+%             firing rate and other metrics
+%             (struct: 1 x num_units)
+%
+%
+%
+% OUTPUTS:
+%
+% Y - true target labels
+%     (struct: 1x1, fields 'l_hand' and 'r_hand'
+%              nested vectors: num_trials x 1)
+%
+% Y_pred - predicted target labels
+%          (struct: 1x1, fields 'l_pref' and 'r_pref'
+%               nested struct: 1x1, fields 'l_hand' and 'r_hand'
+%                   nested struct: 1x1, fields 'rest', 'prep', and 'move'
+%                       nested vectors: num_trials x 1)
+% 
+
+
 %% Prepare feature and class data
 
 [X, Y] = prep_lda_epochs(unit_data);
