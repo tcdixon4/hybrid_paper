@@ -38,7 +38,8 @@ function [princ_var] = pca_align_pref_epochs(unit_data, p, norm_method)
 
 
 %% train pca models on center config data using only non-preferred arm
-% trials and project data for both arms, then calculate variance captured
+% trials and project eccentric config data for both arms, then calculate 
+% variance captured
 
 %% left preferring units
 X_train = X_cen.l_pref.r_hand.rest;
