@@ -41,13 +41,13 @@ function [X, princ_align_self, princ_align_lr]...
 
 X = prep_pca(unit_data, configs, 'both', 'rest');
 X_l_hand_total = cat(3,X.l_hand{:});
-X_l_hand.rest = X_l_hand_total(11:26,:,:);
-X_l_hand.prep = X_l_hand_total(37:52,:,:);
-X_l_hand.move = X_l_hand_total(63:78,:,:);
+X_l_hand.rest = permute(X_l_hand_total(11:26,:,:), [3,2,1]);
+X_l_hand.prep = permute(X_l_hand_total(37:52,:,:), [3,2,1]);
+X_l_hand.move = permute(X_l_hand_total(63:78,:,:), [3,2,1]);
 X_r_hand_total = cat(3,X.r_hand{:});
-X_r_hand.rest = X_r_hand_total(11:26,:,:);
-X_r_hand.prep = X_r_hand_total(37:52,:,:);
-X_r_hand.move = X_r_hand_total(63:78,:,:);
+X_r_hand.rest = permute(X_r_hand_total(11:26,:,:), [3,2,1]);
+X_r_hand.prep = permute(X_r_hand_total(37:52,:,:), [3,2,1]);
+X_r_hand.move = permute(X_r_hand_total(63:78,:,:), [3,2,1]);
 
 
 %% Calculate PC alignment between and within hands for each epoch
