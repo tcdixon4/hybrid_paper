@@ -14,7 +14,8 @@ function [arm_pref, modulation, mu_rest, sigma_rest, p_mod]...
 %
 % OUTPUTS:
 %
-% arm_pref - arm preference, scalar for each unit x phase
+% arm_pref - arm preference, scalar for each unit x phase. positive values
+%            are right preferring
 %            (struct: 1x1, fields 'rest', 'prep', 'move'
 %             nested vector: num_units x 1)
 % 

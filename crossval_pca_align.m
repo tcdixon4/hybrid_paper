@@ -8,26 +8,27 @@ function [alignment, explained_a, explained_b] = ...
 %
 % INPUTS: 
 %
-% X_a - trial-separated firing rate traces for all simultaneously recorded
-%       units
-%       (cell array: num_trials x 1
-%        nested matrices: num_samples x num_units)
+% X_a - data matrix, may include multiple time samples in a trial, i.e. a
+%       trajectory over a time window, or just a single sample
+%       (matrix: number trials x number units x number time samples/trial)
 %
 % X_b - same format as X_a
 %
 % same_cond - specify whether comparing trials using the same or different
-%             hands. boolean
+%             hands. 
+%             (boolean)
 %
 % num_comp - number of principle components to use. integer
 %
-% iterations - number of iterations to randomly divide trials and compute
-%              alignment (this is stochastic for both within and across 
-%              hand comparisons). integer
+% iterations - number of iterations for the Monte Carlo cross-validation  
+%              protoco. this method is stochastic for both within and  
+%              across hand comparisons. 
+%              (integer)
 %
 %
 % OUTPUTS:
 %
-% alignment - alignment across time for trials using the same hand
+% alignment - cross-validated alignment values for X_a and X_b
 %             (vector: 1 x iterations) 
 %
 % explained_a - NON-cross-validated variance accounted for by each PC in
