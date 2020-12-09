@@ -37,7 +37,7 @@ switch phase
     case 'prep'
         idx = 37:52;
     case 'move'
-        idx = 59:74;
+        idx = 63:78;
     case 'all'
         idx = [];
 end
