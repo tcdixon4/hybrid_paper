@@ -40,7 +40,10 @@ clearvars unit_data
 % arm_pref_lr negative means left pref, positive means right pref
 % first column of modulation_ic is ipsi, second is contra
 % first column of modulation_lr is left, second is right
+% arm_pref_ic_idx is True if unit is contra-preferring
+% arm_pref_lr_idx is True if unit is right-preferring
 
+% M1
 for unit = length(m1):-1:1
     modulation_m1_lr.rest(unit,:) = m1(unit).modulation.rest;
     modulation_m1_lr.prep(unit,:) = m1(unit).modulation.prep;
@@ -74,6 +77,15 @@ for unit = length(m1):-1:1
     end
 end
 
+arm_pref_m1_ic_idx.rest = arm_pref_m1_ic.rest > 1;
+arm_pref_m1_ic_idx.prep = arm_pref_m1_ic.prep > 1;
+arm_pref_m1_ic_idx.move = arm_pref_m1_ic.move > 1;
+
+arm_pref_m1_lr_idx.rest = arm_pref_m1_lr.rest > 1;
+arm_pref_m1_lr_idx.prep = arm_pref_m1_lr.prep > 1;
+arm_pref_m1_lr_idx.move = arm_pref_m1_lr.move > 1;
+
+% PMd
 for unit = length(pmd):-1:1
     modulation_pmd_lr.rest(unit,:) = pmd(unit).modulation.rest;
     modulation_pmd_lr.prep(unit,:) = pmd(unit).modulation.prep;
@@ -106,6 +118,14 @@ for unit = length(pmd):-1:1
         modulation_pmd_ic.move(unit,:) = fliplr(pmd(unit).modulation.move);
     end
 end
+
+arm_pref_pmd_ic_idx.rest = arm_pref_pmd_ic.rest > 1;
+arm_pref_pmd_ic_idx.prep = arm_pref_pmd_ic.prep > 1;
+arm_pref_pmd_ic_idx.move = arm_pref_pmd_ic.move > 1;
+
+arm_pref_pmd_lr_idx.rest = arm_pref_pmd_lr.rest > 1;
+arm_pref_pmd_lr_idx.prep = arm_pref_pmd_lr.prep > 1;
+arm_pref_pmd_lr_idx.move = arm_pref_pmd_lr.move > 1;
 
 % clear unit_data since it is very large
 % clearvars m1 pmd
@@ -745,153 +765,160 @@ title('Move','fontsize',24)
 
 %% plot scatter of absolute arm pref vs preferred limb MD
 
-figure('Name', 'Arm dedicated units tend to be more deeply modulated')
+figure('Name', 'Absolute arm preference vs preferred limb MD')
 set(gcf, 'Position',  [2000, 200, 1000, 600])
 
-% PMd Rest
-subplot(2,3,1)
-% plot scatter
-X = abs(arm_pref_pmd_ic.rest);
-Y = log10(max(modulation_pmd_ic.rest,[],2));
-idx = ~isnan(X)&Y>-1;
-scatter(X(idx), Y(idx))
-hold on
-% fit line (log-linear space) and plot on top of scatter
-p = polyfit(X(idx),Y(idx),1);
-f = polyval(p,[-1,1]);
-plot([-1,1],f,'r', 'LineWidth',1.5)
-% format display
-xticks([0,0.5,1])
-yticks([0,1,2])
-xlim([-0.05,1.05])
-ylim([-1,2.5])
-a = get(gca,'XTickLabel');
-set(gca,'XTickLabel',a,'FontName','Helvetica','fontsize',14)
-yticklabels({'10^0','10^1','10^2'})
-ylabel('PMd','fontweight','bold','fontsize',24)
-title('Rest','fontsize',24)
-hYLabel = get(gca,'YLabel');
-set(hYLabel,'rotation',0,'VerticalAlignment','middle')
-grid on
+for k = 1:6
+    % assign arm pref and modulation data for current area and phase combo
+    switch k
+        case 1
+            X = arm_pref_pmd_ic.rest;
+            Y = modulation_pmd_ic.rest;
+            region = 'PMd';
+            phase = 'Rest';
+        case 2
+            X = arm_pref_pmd_ic.prep;
+            Y = modulation_pmd_ic.prep;
+            region = 'PMd';
+            phase = 'Instruct';
+        case 3
+            X = arm_pref_pmd_ic.move;
+            Y = modulation_pmd_ic.move;
+            region = 'PMd';
+            phase = 'Move';
+        case 4
+            X = arm_pref_m1_ic.rest;
+            Y = modulation_m1_ic.rest;
+            region = 'M1';
+            phase = 'Rest';
+        case 5
+            X = arm_pref_m1_ic.prep;
+            Y = modulation_m1_ic.prep;
+            region = 'M1';
+            phase = 'Instruct';
+        case 6
+            X = arm_pref_m1_ic.move;
+            Y = modulation_m1_ic.move;
+            region = 'M1';
+            phase = 'Move';
+    end
+    
+    % select the preferred arm modulation, then take the log of those
+    % modulation values and the absolute value of the arm preferences
+    pref_idx = sub2ind([length(X),2], (1:length(X))', (X>0)+1);
+    X = abs(X);
+    Y = log10(Y(pref_idx));
+    
+    % remove units that have nan arm pref (rare) or units that have very
+    % small modulation. The latter will dominate the regression if not
+    % accounted for.
+    clean_idx = ~isnan(X) & Y>-1;
+    X = X(clean_idx);
+    Y = Y(clean_idx);
+    
+    % compute regression lines (log-linear)
+    p = polyfit(X,Y,1);
+    f = polyval(p,[-1,1]);
 
-% PMd prep
-subplot(2,3,2)
-% plot scatter
-X = abs(arm_pref_pmd_ic.prep);
-Y = log10(max(modulation_pmd_ic.prep,[],2));
-idx = ~isnan(X)&Y>-1;
-scatter(X(idx), Y(idx))
-hold on
-% fit line (log-linear space) and plot on top of scatter
-p = polyfit(X(idx),Y(idx),1);
-f = polyval(p,[-1,1]);
-plot([-1,1],f,'r', 'LineWidth',1.5)
-% format display
-xticks([0,0.5,1])
-yticks([0,1,2])
-xlim([-0.05,1.05])
-ylim([-1,2.5])
-a = get(gca,'XTickLabel');
-set(gca,'XTickLabel',a,'FontName','Helvetica','fontsize',14)
-yticklabels({'10^0','10^1','10^2'})
-title('Prep','fontsize',24)
-grid on
+    % plot
+    subplot(2,3,k)
+    scatter(X,Y)
+    hold on
+    plot([-1,1],f,'r', 'LineWidth',1.5)
+    % format display
+    xticks([0,0.5,1])
+    yticks([0,1,2])
+    xlim([-0.05,1.05])
+    ylim([-1,2.5])
+    a = get(gca,'XTickLabel');
+    set(gca,'XTickLabel',a,'FontName','Helvetica','fontsize',14)
+    yticklabels({'10^0','10^1','10^2'})
+    ylabel(region,'fontweight','bold','fontsize',24)
+    title(phase,'fontsize',24)
+    hYLabel = get(gca,'YLabel');
+    set(hYLabel,'rotation',0,'VerticalAlignment','middle')
+    grid on
+    
+end
 
-% PMd move
-subplot(2,3,3)
-% plot scatter
-X = abs(arm_pref_pmd_ic.move);
-Y = log10(max(modulation_pmd_ic.move,[],2));
-idx = ~isnan(X)&Y>-1;
-scatter(X(idx), Y(idx))
-hold on
-% fit line (log-linear space) and plot on top of scatter
-p = polyfit(X(idx),Y(idx),1);
-f = polyval(p,[-1,1]);
-plot([-1,1],f,'r', 'LineWidth',1.5)
-% format display
-xticks([0,0.5,1])
-yticks([0,1,2])
-xlim([-0.05,1.05])
-ylim([-1,2.5])
-a = get(gca,'XTickLabel');
-set(gca,'XTickLabel',a,'FontName','Helvetica','fontsize',14)
-yticklabels({'10^0','10^1','10^2'})
-title('Move','fontsize',24)
-grid on
 
-% m1 Rest
-subplot(2,3,4)
-% plot scatter
-X = abs(arm_pref_m1_ic.rest);
-Y = log10(max(modulation_m1_ic.rest,[],2));
-idx = ~isnan(X)&Y>-1;
-scatter(X(idx), Y(idx))
-hold on
-% fit line (log-linear space) and plot on top of scatter
-p = polyfit(X(idx),Y(idx),1);
-f = polyval(p,[-1,1]);
-plot([-1,1],f,'r', 'LineWidth',1.5)
-% format display
-xticks([0,0.5,1])
-yticks([0,1,2])
-xlim([-0.05,1.05])
-ylim([-1,2.5])
-a = get(gca,'XTickLabel');
-set(gca,'XTickLabel',a,'FontName','Helvetica','fontsize',14)
-yticklabels({'10^0','10^1','10^2'})
-ylabel('M1','fontweight','bold','fontsize',24)
-title('Rest','fontsize',24)
-hYLabel = get(gca,'YLabel');
-set(hYLabel,'rotation',0,'VerticalAlignment','middle')
-xlabel('Arm Preference','fontsize',16)
-grid on
+%% plot scatter of absolute arm pref vs non-preferred limb MD
 
-% M1 prep
-subplot(2,3,5)
-% plot scatter
-X = abs(arm_pref_m1_ic.prep);
-Y = log10(max(modulation_m1_ic.prep,[],2));
-idx = ~isnan(X)&Y>-1;
-scatter(X(idx), Y(idx))
-hold on
-% fit line (log-linear space) and plot on top of scatter
-p = polyfit(X(idx),Y(idx),1);
-f = polyval(p,[-1,1]);
-plot([-1,1],f,'r', 'LineWidth',1.5)
-% format display
-xticks([0,0.5,1])
-yticks([0,1,2])
-xlim([-0.05,1.05])
-ylim([-1,2.5])
-a = get(gca,'XTickLabel');
-set(gca,'XTickLabel',a,'FontName','Helvetica','fontsize',14)
-yticklabels({'10^0','10^1','10^2'})
-title('Prep','fontsize',24)
-grid on
+figure('Name', 'Absolute arm preference vs preferred limb MD')
+set(gcf, 'Position',  [2000, 200, 1000, 600])
 
-% m1 move
-subplot(2,3,6)
-% plot scatter
-X = abs(arm_pref_m1_ic.move);
-Y = log10(max(modulation_m1_ic.move,[],2));
-idx = ~isnan(X)&Y>-1;
-scatter(X(idx), Y(idx))
-hold on
-% fit line (log-linear space) and plot on top of scatter
-p = polyfit(X(idx),Y(idx),1);
-f = polyval(p,[-1,1]);
-plot([-1,1],f,'r', 'LineWidth',1.5)
-% format display
-xticks([0,0.5,1])
-yticks([0,1,2])
-xlim([-0.05,1.05])
-ylim([-1,2.5])
-a = get(gca,'XTickLabel');
-set(gca,'XTickLabel',a,'FontName','Helvetica','fontsize',14)
-yticklabels({'10^0','10^1','10^2'})
-title('Move','fontsize',24)
-grid on
+for k = 1:6
+    % assign arm pref and modulation data for current area and phase combo
+    switch k
+        case 1
+            X = arm_pref_pmd_ic.rest;
+            Y = modulation_pmd_ic.rest;
+            region = 'PMd';
+            phase = 'Rest';
+        case 2
+            X = arm_pref_pmd_ic.prep;
+            Y = modulation_pmd_ic.prep;
+            region = 'PMd';
+            phase = 'Instruct';
+        case 3
+            X = arm_pref_pmd_ic.move;
+            Y = modulation_pmd_ic.move;
+            region = 'PMd';
+            phase = 'Move';
+        case 4
+            X = arm_pref_m1_ic.rest;
+            Y = modulation_m1_ic.rest;
+            region = 'M1';
+            phase = 'Rest';
+        case 5
+            X = arm_pref_m1_ic.prep;
+            Y = modulation_m1_ic.prep;
+            region = 'M1';
+            phase = 'Instruct';
+        case 6
+            X = arm_pref_m1_ic.move;
+            Y = modulation_m1_ic.move;
+            region = 'M1';
+            phase = 'Move';
+    end
+    
+    % select the non-preferred arm modulation, then take the log of those
+    % modulation values and the absolute value of the arm preferences
+    pref_idx = sub2ind([length(X),2], (1:length(X))', (X<0)+1);
+    X = abs(X);
+    Y = log10(Y(pref_idx));
+    
+    % remove units that have nan arm pref or units that have very little
+    % modulation (both rare). The latter will dominate the regression if 
+    % not accounted for.
+    clean_idx = ~isnan(X) & Y>-1;
+    X = X(clean_idx);
+    Y = Y(clean_idx);
+    
+    % compute regression lines (log-linear)
+    p = polyfit(X,Y,1);
+    f = polyval(p,[-1,1]);
+
+    % plot
+    subplot(2,3,k)
+    scatter(X,Y)
+    hold on
+    plot([-1,1],f,'r', 'LineWidth',1.5)
+    % format display
+    xticks([0,0.5,1])
+    yticks([0,1,2])
+    xlim([-0.05,1.05])
+    ylim([-1,2.5])
+    a = get(gca,'XTickLabel');
+    set(gca,'XTickLabel',a,'FontName','Helvetica','fontsize',14)
+    yticklabels({'10^0','10^1','10^2'})
+    ylabel(region,'fontweight','bold','fontsize',24)
+    title(phase,'fontsize',24)
+    hYLabel = get(gca,'YLabel');
+    set(hYLabel,'rotation',0,'VerticalAlignment','middle')
+    grid on
+    
+end
 
 
 %% plot slopes across epochs, bootstrap
