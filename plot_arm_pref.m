@@ -921,7 +921,7 @@ for k = 1:6
 end
 
 
-%% plot slopes across epochs, bootstrap
+%% plot preferred arm modulation vs arm pref slopes across epochs
 
 % compute bootstrapped slopes to fill out distribution. 10,000 bootstraps
 % with resample sizes same as original
@@ -930,31 +930,31 @@ for boot = 10000:-1:1
     
     % pmd
     slope_pmd_ipsi(boot,1) = compute_bs_slope(...
-        arm_pref_pmd_ic.rest, modulation_pmd_ic.rest, 'ipsi');
+        arm_pref_pmd_ic.rest, modulation_pmd_ic.rest, 'ipsi', 'pref');
     slope_pmd_contra(boot,1) = compute_bs_slope(...
-        arm_pref_pmd_ic.rest, modulation_pmd_ic.rest, 'contra');
+        arm_pref_pmd_ic.rest, modulation_pmd_ic.rest, 'contra', 'pref');
     slope_pmd_ipsi(boot,2) = compute_bs_slope(...
-        arm_pref_pmd_ic.prep, modulation_pmd_ic.prep, 'ipsi');
+        arm_pref_pmd_ic.prep, modulation_pmd_ic.prep, 'ipsi', 'pref');
     slope_pmd_contra(boot,2) = compute_bs_slope(...
-        arm_pref_pmd_ic.prep, modulation_pmd_ic.prep, 'contra');
+        arm_pref_pmd_ic.prep, modulation_pmd_ic.prep, 'contra', 'pref');
     slope_pmd_ipsi(boot,3) = compute_bs_slope(...
-        arm_pref_pmd_ic.move, modulation_pmd_ic.move, 'ipsi');
+        arm_pref_pmd_ic.move, modulation_pmd_ic.move, 'ipsi', 'pref');
     slope_pmd_contra(boot,3) = compute_bs_slope(...
-        arm_pref_pmd_ic.move, modulation_pmd_ic.move, 'contra');
+        arm_pref_pmd_ic.move, modulation_pmd_ic.move, 'contra', 'pref');
     
     % m1
     slope_m1_ipsi(boot,1) = compute_bs_slope(...
-        arm_pref_m1_ic.rest, modulation_m1_ic.rest, 'ipsi');
+        arm_pref_m1_ic.rest, modulation_m1_ic.rest, 'ipsi', 'pref');
     slope_m1_contra(boot,1) = compute_bs_slope(...
-        arm_pref_m1_ic.rest, modulation_m1_ic.rest, 'contra');
+        arm_pref_m1_ic.rest, modulation_m1_ic.rest, 'contra', 'pref');
     slope_m1_ipsi(boot,2) = compute_bs_slope(...
-        arm_pref_m1_ic.prep, modulation_m1_ic.prep, 'ipsi');
+        arm_pref_m1_ic.prep, modulation_m1_ic.prep, 'ipsi', 'pref');
     slope_m1_contra(boot,2) = compute_bs_slope(...
-        arm_pref_m1_ic.prep, modulation_m1_ic.prep, 'contra');
+        arm_pref_m1_ic.prep, modulation_m1_ic.prep, 'contra', 'pref');
     slope_m1_ipsi(boot,3) = compute_bs_slope(...
-        arm_pref_m1_ic.move, modulation_m1_ic.move, 'ipsi');
+        arm_pref_m1_ic.move, modulation_m1_ic.move, 'ipsi', 'pref');
     slope_m1_contra(boot,3) = compute_bs_slope(...
-        arm_pref_m1_ic.move, modulation_m1_ic.move, 'contra');
+        arm_pref_m1_ic.move, modulation_m1_ic.move, 'contra', 'pref');
 
 end
 
@@ -976,7 +976,7 @@ pos_m1_ipsi = -Y_m1_ipsi + quantile(slope_m1_ipsi, 0.975);
 pos_m1_contra = -Y_m1_contra + quantile(slope_m1_contra, 0.975);
 
 % plot
-figure('Name', 'Slope of arm dedication, MD relationship across epochs')
+figure('Name', 'Slope of arm pref, pref MD relationship across epochs')
 set(gcf, 'Position',  [200, 200, 350, 600])
 
 subplot(2,1,1)
@@ -997,6 +997,8 @@ hYLabel = get(gca,'YLabel');
 set(hYLabel,'rotation',0,'VerticalAlignment','middle', 'HorizontalAlignment','right')
 legend({'Ipsi','Contra'})
 title('PMd')
+ax = gca;
+ax.Clipping = 'off';
 
 subplot(2,1,2)
 errorbar([1:3]-0.05, Y_m1_ipsi, neg_m1_ipsi, pos_m1_ipsi, ...
@@ -1016,10 +1018,112 @@ hYLabel = get(gca,'YLabel');
 set(hYLabel,'rotation',0,'VerticalAlignment','middle', 'HorizontalAlignment','right')
 legend({'Ipsi','Contra'})
 title('M1')
+ax = gca;
+ax.Clipping = 'off';
+
+
+%% plot non-preferred arm modulation vs arm pref slopes across epochs
+
+% compute bootstrapped slopes to fill out distribution. 10,000 bootstraps
+% with resample sizes same as original
+
+for boot = 10000:-1:1
+    
+    % pmd
+    slope_pmd_ipsi(boot,1) = compute_bs_slope(...
+        arm_pref_pmd_ic.rest, modulation_pmd_ic.rest, 'ipsi', 'non');
+    slope_pmd_contra(boot,1) = compute_bs_slope(...
+        arm_pref_pmd_ic.rest, modulation_pmd_ic.rest, 'contra', 'non');
+    slope_pmd_ipsi(boot,2) = compute_bs_slope(...
+        arm_pref_pmd_ic.prep, modulation_pmd_ic.prep, 'ipsi', 'non');
+    slope_pmd_contra(boot,2) = compute_bs_slope(...
+        arm_pref_pmd_ic.prep, modulation_pmd_ic.prep, 'contra', 'non');
+    slope_pmd_ipsi(boot,3) = compute_bs_slope(...
+        arm_pref_pmd_ic.move, modulation_pmd_ic.move, 'ipsi', 'non');
+    slope_pmd_contra(boot,3) = compute_bs_slope(...
+        arm_pref_pmd_ic.move, modulation_pmd_ic.move, 'contra', 'non');
+    
+    % m1
+    slope_m1_ipsi(boot,1) = compute_bs_slope(...
+        arm_pref_m1_ic.rest, modulation_m1_ic.rest, 'ipsi', 'non');
+    slope_m1_contra(boot,1) = compute_bs_slope(...
+        arm_pref_m1_ic.rest, modulation_m1_ic.rest, 'contra', 'non');
+    slope_m1_ipsi(boot,2) = compute_bs_slope(...
+        arm_pref_m1_ic.prep, modulation_m1_ic.prep, 'ipsi', 'non');
+    slope_m1_contra(boot,2) = compute_bs_slope(...
+        arm_pref_m1_ic.prep, modulation_m1_ic.prep, 'contra', 'non');
+    slope_m1_ipsi(boot,3) = compute_bs_slope(...
+        arm_pref_m1_ic.move, modulation_m1_ic.move, 'ipsi', 'non');
+    slope_m1_contra(boot,3) = compute_bs_slope(...
+        arm_pref_m1_ic.move, modulation_m1_ic.move, 'contra', 'non');
+
+end
+
+% find center of the bootstrapped distribution
+Y_pmd_ipsi = mean(slope_pmd_ipsi);
+Y_pmd_contra = mean(slope_pmd_contra);
+Y_m1_ipsi = mean(slope_m1_ipsi);
+Y_m1_contra = mean(slope_m1_contra);
+
+% find 95% CI
+neg_pmd_ipsi = Y_pmd_ipsi - quantile(slope_pmd_ipsi, 0.025);
+neg_pmd_contra = Y_pmd_contra - quantile(slope_pmd_contra, 0.025);
+neg_m1_ipsi = Y_m1_ipsi - quantile(slope_m1_ipsi, 0.025);
+neg_m1_contra = Y_m1_contra - quantile(slope_m1_contra, 0.025);
+
+pos_pmd_ipsi = -Y_pmd_ipsi + quantile(slope_pmd_ipsi, 0.975);
+pos_pmd_contra = -Y_pmd_contra + quantile(slope_pmd_contra, 0.975);
+pos_m1_ipsi = -Y_m1_ipsi + quantile(slope_m1_ipsi, 0.975);
+pos_m1_contra = -Y_m1_contra + quantile(slope_m1_contra, 0.975);
+
+% plot
+figure('Name', 'Slope of arm pref, non-pref MD relationship across epochs')
+set(gcf, 'Position',  [200, 200, 350, 600])
+
+subplot(2,1,1)
+errorbar([1:3]-0.05, Y_pmd_ipsi, neg_pmd_ipsi, pos_pmd_ipsi, ...
+    'o-', 'LineWidth',1.5)
+hold on
+errorbar([1:3]+0.05, Y_pmd_contra, neg_pmd_contra, pos_pmd_contra, ...
+    'o-', 'LineWidth',1.5)
+xlim([0.5, 3.5])
+xticks([1,2,3])
+xticklabels({'Rest','Prep','Move'})
+a = get(gca,'XTickLabel');
+set(gca,'XTickLabel',a,'FontName','Helvetica','fontsize',16)
+yticks([-1,0,1])
+ylabel('Slope','fontsize',16)
+ylim([-1.1,1.1])
+hYLabel = get(gca,'YLabel');
+set(hYLabel,'rotation',0,'VerticalAlignment','middle', 'HorizontalAlignment','right')
+legend({'Ipsi','Contra'})
+title('PMd')
+ax = gca;
+ax.Clipping = 'off';
+
+subplot(2,1,2)
+errorbar([1:3]-0.05, Y_m1_ipsi, neg_m1_ipsi, pos_m1_ipsi, ...
+    'o-', 'LineWidth',1.5)
+hold on
+errorbar([1:3]+0.05, Y_m1_contra, neg_m1_contra, pos_m1_contra, ...
+    'o-', 'LineWidth',1.5)
+xlim([0.5, 3.5])
+xticks([1,2,3])
+xticklabels({'Rest','Prep','Move'})
+a = get(gca,'XTickLabel');
+set(gca,'XTickLabel',a,'FontName','Helvetica','fontsize',16)
+yticks([-1,0,1])
+ylabel('Slope','fontsize',16)
+ylim([-1.1,1.1])
+hYLabel = get(gca,'YLabel');
+set(hYLabel,'rotation',0,'VerticalAlignment','middle', 'HorizontalAlignment','right')
+legend({'Ipsi','Contra'})
+title('M1')
+ax = gca;
+ax.Clipping = 'off';
 
 
 %% plot cumulative modulation accounted for, rest phase
-% Come back to this to bootstrap confidence intervals
 
 % sort by arm preference (using held out data for assignments)
 [sorted_arm_pref, idx] = ...
@@ -1160,7 +1264,6 @@ title('Rest')
 
 
 %% plot cumulative modulation accounted for, instruct phase
-% Come back to this to bootstrap confidence intervals
 
 % sort by arm preference (using held out data for assignments)
 [sorted_arm_pref, idx] = ...
@@ -1301,7 +1404,6 @@ title('Instruct')
 
 
 %% plot cumulative modulation accounted for, move phase
-% Come back to this to bootstrap confidence intervals
 
 % sort by arm preference (using held out data for assignments)
 [sorted_arm_pref, idx] = ...
@@ -1480,13 +1582,17 @@ title('MD dist across phases')
 
 %% local functions
 
-    function slope = compute_bs_slope(X, Y, contra_ipsi)
+    function slope = compute_bs_slope(X, Y, contra_ipsi, pref_non)
     % cleans arm pref and modulation data, then computes the slope of their
     % relationship
     
     % select the preferred arm modulation, then take the log of those
     % modulation values and the absolute value of the arm preferences
-    pref_idx = sub2ind([length(X),2], (1:length(X))', (X>0)+1);
+    if strcmp(pref_non, 'pref')
+        pref_idx = sub2ind([length(X),2], (1:length(X))', (X>0)+1);
+    elseif strcmp(pref_non, 'non')
+        pref_idx = sub2ind([length(X),2], (1:length(X))', (X<0)+1);
+    end
     Y = log10(Y(pref_idx));
     
     % select only units that prefer the arm designated by input
