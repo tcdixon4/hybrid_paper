@@ -844,7 +844,7 @@ end
 
 %% plot scatter of absolute arm pref vs non-preferred limb MD
 
-figure('Name', 'Absolute arm preference vs preferred limb MD')
+figure('Name', 'Absolute arm preference vs non-preferred limb MD')
 set(gcf, 'Position',  [2000, 200, 1000, 600])
 
 for k = 1:6
@@ -923,147 +923,40 @@ end
 
 %% plot slopes across epochs, bootstrap
 
-% run bootstrapping procedure over 10,000 bootstraps of same sized samples
+% compute bootstrapped slopes to fill out distribution. 10,000 bootstraps
+% with resample sizes same as original
 
 for boot = 10000:-1:1
     
     % pmd
-    X = arm_pref_pmd_ic.rest;
-    Y = log10(max(modulation_pmd_ic.rest,[],2));
-    idx = X<0 & ~isnan(X) & Y>-1;
-    Y = Y(idx);
-    X = X(idx);
-    [X, idx] = datasample(X, length(X), 'Replace',true);
-    Y = Y(idx);
-    b = polyfit(X,Y,1);
-    slope_pmd_ipsi(boot,1) = b(1);
-    
-    X = arm_pref_pmd_ic.rest;
-    Y = log10(max(modulation_pmd_ic.rest,[],2));
-    idx = X>0 & ~isnan(X) & Y>-1;
-    Y = Y(idx);
-    X = X(idx);
-    [X, idx] = datasample(X, length(X), 'Replace',true);
-    Y = Y(idx);
-    b = polyfit(X,Y,1);
-    slope_pmd_contra(boot,1) = b(1);
-    
-    X = arm_pref_pmd_ic.prep;
-    Y = log10(max(modulation_pmd_ic.prep,[],2));
-    idx = X<0 & ~isnan(X) & Y>-1;
-    Y = Y(idx);
-    X = X(idx);
-    [X, idx] = datasample(X, length(X), 'Replace',true);
-    Y = Y(idx);
-    b = polyfit(X,Y,1);
-    slope_pmd_ipsi(boot,2) = b(1);
-    
-    X = arm_pref_pmd_ic.prep;
-    Y = log10(max(modulation_pmd_ic.prep,[],2));
-    idx = X>0 & ~isnan(X) & Y>-1;
-    Y = Y(idx);
-    X = X(idx);
-    [X, idx] = datasample(X, length(X), 'Replace',true);
-    Y = Y(idx);
-    b = polyfit(X,Y,1);
-    slope_pmd_contra(boot,2) = b(1);
-    
-    X = arm_pref_pmd_ic.move;
-    Y = log10(max(modulation_pmd_ic.move,[],2));
-    idx = X<0 & ~isnan(X) & Y>-1;
-    Y = Y(idx);
-    X = X(idx);
-    [X, idx] = datasample(X, length(X), 'Replace',true);
-    Y = Y(idx);
-    b = polyfit(X,Y,1);
-    slope_pmd_ipsi(boot,3) = b(1);
-    
-    X = arm_pref_pmd_ic.move;
-    Y = log10(max(modulation_pmd_ic.move,[],2));
-    idx = X>0 & ~isnan(X) & Y>-1;
-    Y = Y(idx);
-    X = X(idx);
-    [X, idx] = datasample(X, length(X), 'Replace',true);
-    Y = Y(idx);
-    b = polyfit(X,Y,1);
-    slope_pmd_contra(boot,3) = b(1);
+    slope_pmd_ipsi(boot,1) = compute_bs_slope(...
+        arm_pref_pmd_ic.rest, modulation_pmd_ic.rest, 'ipsi');
+    slope_pmd_contra(boot,1) = compute_bs_slope(...
+        arm_pref_pmd_ic.rest, modulation_pmd_ic.rest, 'contra');
+    slope_pmd_ipsi(boot,2) = compute_bs_slope(...
+        arm_pref_pmd_ic.prep, modulation_pmd_ic.prep, 'ipsi');
+    slope_pmd_contra(boot,2) = compute_bs_slope(...
+        arm_pref_pmd_ic.prep, modulation_pmd_ic.prep, 'contra');
+    slope_pmd_ipsi(boot,3) = compute_bs_slope(...
+        arm_pref_pmd_ic.move, modulation_pmd_ic.move, 'ipsi');
+    slope_pmd_contra(boot,3) = compute_bs_slope(...
+        arm_pref_pmd_ic.move, modulation_pmd_ic.move, 'contra');
     
     % m1
-    X = arm_pref_m1_ic.rest;
-    Y = log10(max(modulation_m1_ic.rest,[],2));
-    idx = X<0 & ~isnan(X) & Y>-1;
-    Y = Y(idx);
-    X = X(idx);   
-    [X, idx] = datasample(X, length(X), 'Replace',true);
-    Y = Y(idx);
-    b = polyfit(X,Y,1);
-    slope_m1_ipsi(boot,1) = b(1);
-    
-    X = arm_pref_m1_ic.rest;
-    Y = log10(max(modulation_m1_ic.rest,[],2));
-    idx = X>0 & ~isnan(X) & Y>-1;
-    Y = Y(idx);
-    X = X(idx);
-    [X, idx] = datasample(X, length(X), 'Replace',true);
-    Y = Y(idx);
-    b = polyfit(X,Y,1);
-    slope_m1_contra(boot,1) = b(1);
-    
-    X = arm_pref_m1_ic.prep;
-    Y = log10(max(modulation_m1_ic.prep,[],2));
-    idx = X<0 & ~isnan(X) & Y>-1;
-    Y = Y(idx);
-    X = X(idx);
-    [X, idx] = datasample(X, length(X), 'Replace',true);
-    Y = Y(idx);
-    b = polyfit(X,Y,1);
-    slope_m1_ipsi(boot,2) = b(1);
-    
-    X = arm_pref_m1_ic.prep;
-    Y = log10(max(modulation_m1_ic.prep,[],2));
-    idx = X>0 & ~isnan(X) & Y>-1;
-    Y = Y(idx);
-    X = X(idx);
-    [X, idx] = datasample(X, length(X), 'Replace',true);
-    Y = Y(idx);
-    b = polyfit(X,Y,1);
-    slope_m1_contra(boot,2) = b(1);
-    
-    X = arm_pref_m1_ic.move;
-    Y = log10(max(modulation_m1_ic.move,[],2));
-    idx = X<0 & ~isnan(X) & Y>-1;
-    Y = Y(idx);
-    X = X(idx);
-    [X, idx] = datasample(X, length(X), 'Replace',true);
-    Y = Y(idx);
-    b = polyfit(X,Y,1);
-    slope_m1_ipsi(boot,3) = b(1);
-    
-    X = arm_pref_m1_ic.move;
-    Y = log10(max(modulation_m1_ic.move,[],2));
-    idx = X>0 & ~isnan(X) & Y>-1;
-    Y = Y(idx);
-    X = X(idx);
-    [X, idx] = datasample(X, length(X), 'Replace',true);
-    Y = Y(idx);
-    b = polyfit(X,Y,1);
-    slope_m1_contra(boot,3) = b(1);
-    
-end
+    slope_m1_ipsi(boot,1) = compute_bs_slope(...
+        arm_pref_m1_ic.rest, modulation_m1_ic.rest, 'ipsi');
+    slope_m1_contra(boot,1) = compute_bs_slope(...
+        arm_pref_m1_ic.rest, modulation_m1_ic.rest, 'contra');
+    slope_m1_ipsi(boot,2) = compute_bs_slope(...
+        arm_pref_m1_ic.prep, modulation_m1_ic.prep, 'ipsi');
+    slope_m1_contra(boot,2) = compute_bs_slope(...
+        arm_pref_m1_ic.prep, modulation_m1_ic.prep, 'contra');
+    slope_m1_ipsi(boot,3) = compute_bs_slope(...
+        arm_pref_m1_ic.move, modulation_m1_ic.move, 'ipsi');
+    slope_m1_contra(boot,3) = compute_bs_slope(...
+        arm_pref_m1_ic.move, modulation_m1_ic.move, 'contra');
 
-% sort results
-slope_pmd_ipsi = [sort(-slope_pmd_ipsi(:,1),1),...
-    sort(-slope_pmd_ipsi(:,2),1),...
-    sort(-slope_pmd_ipsi(:,3),1)];
-slope_pmd_contra = [sort(slope_pmd_contra(:,1),1),...
-    sort(slope_pmd_contra(:,2),1),...
-    sort(slope_pmd_contra(:,3),1)];
-slope_m1_ipsi = [sort(-slope_m1_ipsi(:,1),1),...
-    sort(-slope_m1_ipsi(:,2),1),...
-    sort(-slope_m1_ipsi(:,3),1)];
-slope_m1_contra = [sort(slope_m1_contra(:,1),1),...
-    sort(slope_m1_contra(:,2),1),...
-    sort(slope_m1_contra(:,3),1)];
+end
 
 % find center of the bootstrapped distribution
 Y_pmd_ipsi = mean(slope_pmd_ipsi);
@@ -1081,362 +974,6 @@ pos_pmd_ipsi = -Y_pmd_ipsi + quantile(slope_pmd_ipsi, 0.975);
 pos_pmd_contra = -Y_pmd_contra + quantile(slope_pmd_contra, 0.975);
 pos_m1_ipsi = -Y_m1_ipsi + quantile(slope_m1_ipsi, 0.975);
 pos_m1_contra = -Y_m1_contra + quantile(slope_m1_contra, 0.975);
-
-% permutation test for testing differences across task phases
-% permute random resamples of each pairwise grouping
-slope_pmd_ipsi_rp = zeros(10000,1);
-slope_pmd_ipsi_rm = zeros(10000,1);
-slope_pmd_ipsi_pm = zeros(10000,1);
-slope_pmd_contra_rp = zeros(10000,1);
-slope_pmd_contra_rm = zeros(10000,1);
-slope_pmd_contra_pm = zeros(10000,1);
-slope_m1_ipsi_rp = zeros(10000,1);
-slope_m1_ipsi_rm = zeros(10000,1);
-slope_m1_ipsi_pm = zeros(10000,1);
-slope_m1_contra_rp = zeros(10000,1);
-slope_m1_contra_rm = zeros(10000,1);
-slope_m1_contra_pm = zeros(10000,1);
-parfor perm = 1:10000
-    
-    % pmd, ipsi
-    X_rest = arm_pref_pmd_ic.rest;
-    Y_rest = log10(max(modulation_pmd_ic.rest,[],2));
-    idx = X_rest<0 & ~isnan(X_rest) & Y_rest>-1;
-    X_rest = X_rest(idx);
-    Y_rest = Y_rest(idx);
-    n_rest = length(X_rest);
-    
-    X_prep = arm_pref_pmd_ic.prep;
-    Y_prep = log10(max(modulation_pmd_ic.prep,[],2));
-    idx = X_prep<0 & ~isnan(X_prep) & Y_prep>-1;
-    X_prep = X_prep(idx);
-    Y_prep = Y_prep(idx);
-    n_prep = length(X_prep);
-    
-    X_move = arm_pref_pmd_ic.move;
-    Y_move = log10(max(modulation_pmd_ic.move,[],2));
-    idx = X_move<0 & ~isnan(X_move) & Y_move>-1;
-    X_move = X_move(idx);
-    Y_move = Y_move(idx);
-    n_move = length(X_move);
-    
-    X_rp = [X_rest; X_prep];
-    Y_rp = [Y_rest; Y_prep];
-    r_idx = randi(length(X_rp), n_rest,1);
-    X_rp_r = X_rp(r_idx);
-    Y_rp_r = Y_rp(r_idx);
-    X_rp_p = X_rp(setdiff(1:length(X_rp),r_idx));
-    Y_rp_p = Y_rp(setdiff(1:length(Y_rp),r_idx));
-    b_r = polyfit(X_rp_r, Y_rp_r, 1);
-    b_p = polyfit(X_rp_p, Y_rp_p, 1);
-    slope_pmd_ipsi_rp(perm,1) = b_p(1) - b_r(1);
-    
-    X_rm = [X_rest; X_move];
-    Y_rm = [Y_rest; X_move];
-    r_idx = randi(length(X_rm), n_rest,1);
-    X_rm_r = X_rm(r_idx);
-    Y_rm_r = Y_rm(r_idx);
-    X_rm_m = X_rm(setdiff(1:length(X_rm),r_idx));
-    Y_rm_m = Y_rm(setdiff(1:length(Y_rm),r_idx));
-    b_r = polyfit(X_rm_r, Y_rm_r, 1);
-    b_m = polyfit(X_rm_m, Y_rm_m, 1);
-    slope_pmd_ipsi_rm(perm,1) = b_m(1) - b_r(1);
-    
-    X_pm = [X_prep; X_move];
-    Y_pm = [Y_prep; X_move];
-    p_idx = randi(length(X_pm), n_prep,1);
-    X_pm_p = X_pm(p_idx);
-    Y_pm_p = Y_pm(p_idx);
-    X_pm_m = X_pm(setdiff(1:length(X_pm),p_idx));
-    Y_pm_m = Y_pm(setdiff(1:length(Y_pm),p_idx));
-    b_p = polyfit(X_pm_p, Y_pm_p, 1);
-    b_m = polyfit(X_pm_m, Y_pm_m, 1);
-    slope_pmd_ipsi_pm(perm,1) = b_m(1) - b_p(1);
-  
-    
-    % pmd, contra
-    X_rest = arm_pref_pmd_ic.rest;
-    Y_rest = log10(max(modulation_pmd_ic.rest,[],2));
-    idx = X_rest>0 & ~isnan(X_rest) & Y_rest>-1;
-    X_rest = X_rest(idx);
-    Y_rest = Y_rest(idx);
-    n_rest = length(X_rest);
-    
-    X_prep = arm_pref_pmd_ic.prep;
-    Y_prep = log10(max(modulation_pmd_ic.prep,[],2));
-    idx = X_prep>0 & ~isnan(X_prep) & Y_prep>-1;
-    X_prep = X_prep(idx);
-    Y_prep = Y_prep(idx);
-    n_prep = length(X_prep);
-    
-    X_move = arm_pref_pmd_ic.move;
-    Y_move = log10(max(modulation_pmd_ic.move,[],2));
-    idx = X_move>0 & ~isnan(X_move) & Y_move>-1;
-    X_move = X_move(idx);
-    Y_move = Y_move(idx);
-    n_move = length(X_move);
-    
-    X_rp = [X_rest; X_prep];
-    Y_rp = [Y_rest; Y_prep];
-    r_idx = randi(length(X_rp), n_rest,1);
-    X_rp_r = X_rp(r_idx);
-    Y_rp_r = Y_rp(r_idx);
-    X_rp_p = X_rp(setdiff(1:length(X_rp),r_idx));
-    Y_rp_p = Y_rp(setdiff(1:length(Y_rp),r_idx));
-    b_r = polyfit(X_rp_r, Y_rp_r, 1);
-    b_p = polyfit(X_rp_p, Y_rp_p, 1);
-    slope_pmd_contra_rp(perm,1) = b_p(1) - b_r(1);
-    
-    X_rm = [X_rest; X_move];
-    Y_rm = [Y_rest; X_move];
-    r_idx = randi(length(X_rm), n_rest,1);
-    X_rm_r = X_rm(r_idx);
-    Y_rm_r = Y_rm(r_idx);
-    X_rm_m = X_rm(setdiff(1:length(X_rm),r_idx));
-    Y_rm_m = Y_rm(setdiff(1:length(Y_rm),r_idx));
-    b_r = polyfit(X_rm_r, Y_rm_r, 1);
-    b_m = polyfit(X_rm_m, Y_rm_m, 1);
-    slope_pmd_contra_rm(perm,1) = b_m(1) - b_r(1);
-    
-    X_pm = [X_prep; X_move];
-    Y_pm = [Y_prep; X_move];
-    p_idx = randi(length(X_pm), n_prep,1);
-    X_pm_p = X_pm(p_idx);
-    Y_pm_p = Y_pm(p_idx);
-    X_pm_m = X_pm(setdiff(1:length(X_pm),p_idx));
-    Y_pm_m = Y_pm(setdiff(1:length(Y_pm),p_idx));
-    b_p = polyfit(X_pm_p, Y_pm_p, 1);
-    b_m = polyfit(X_pm_m, Y_pm_m, 1);
-    slope_pmd_contra_pm(perm,1) = b_m(1) - b_p(1);
-    
-    % m1, ipsi
-    X_rest = arm_pref_m1_ic.rest;
-    Y_rest = log10(max(modulation_m1_ic.rest,[],2));
-    idx = X_rest<0 & ~isnan(X_rest) & Y_rest>-1;
-    X_rest = X_rest(idx);
-    Y_rest = Y_rest(idx);
-    n_rest = length(X_rest);
-    
-    X_prep = arm_pref_m1_ic.prep;
-    Y_prep = log10(max(modulation_m1_ic.prep,[],2));
-    idx = X_prep<0 & ~isnan(X_prep) & Y_prep>-1;
-    X_prep = X_prep(idx);
-    Y_prep = Y_prep(idx);
-    n_prep = length(X_prep);
-    
-    X_move = arm_pref_m1_ic.move;
-    Y_move = log10(max(modulation_m1_ic.move,[],2));
-    idx = X_move<0 & ~isnan(X_move) & Y_move>-1;
-    X_move = X_move(idx);
-    Y_move = Y_move(idx);
-    n_move = length(X_move);
-    
-    X_rp = [X_rest; X_prep];
-    Y_rp = [Y_rest; Y_prep];
-    r_idx = randi(length(X_rp), n_rest,1);
-    X_rp_r = X_rp(r_idx);
-    Y_rp_r = Y_rp(r_idx);
-    X_rp_p = X_rp(setdiff(1:length(X_rp),r_idx));
-    Y_rp_p = Y_rp(setdiff(1:length(Y_rp),r_idx));
-    b_r = polyfit(X_rp_r, Y_rp_r, 1);
-    b_p = polyfit(X_rp_p, Y_rp_p, 1);
-    slope_m1_ipsi_rp(perm,1) = b_p(1) - b_r(1);
-    
-    X_rm = [X_rest; X_move];
-    Y_rm = [Y_rest; X_move];
-    r_idx = randi(length(X_rm), n_rest,1);
-    X_rm_r = X_rm(r_idx);
-    Y_rm_r = Y_rm(r_idx);
-    X_rm_m = X_rm(setdiff(1:length(X_rm),r_idx));
-    Y_rm_m = Y_rm(setdiff(1:length(Y_rm),r_idx));
-    b_r = polyfit(X_rm_r, Y_rm_r, 1);
-    b_m = polyfit(X_rm_m, Y_rm_m, 1);
-    slope_m1_ipsi_rm(perm,1) = b_m(1) - b_r(1);
-    
-    X_pm = [X_prep; X_move];
-    Y_pm = [Y_prep; X_move];
-    p_idx = randi(length(X_pm), n_prep,1);
-    X_pm_p = X_pm(p_idx);
-    Y_pm_p = Y_pm(p_idx);
-    X_pm_m = X_pm(setdiff(1:length(X_pm),p_idx));
-    Y_pm_m = Y_pm(setdiff(1:length(Y_pm),p_idx));
-    b_p = polyfit(X_pm_p, Y_pm_p, 1);
-    b_m = polyfit(X_pm_m, Y_pm_m, 1);
-    slope_m1_ipsi_pm(perm,1) = b_m(1) - b_p(1);
-  
-    
-    % m1, contra
-    X_rest = arm_pref_m1_ic.rest;
-    Y_rest = log10(max(modulation_m1_ic.rest,[],2));
-    idx = X_rest>0 & ~isnan(X_rest) & Y_rest>-1;
-    X_rest = X_rest(idx);
-    Y_rest = Y_rest(idx);
-    n_rest = length(X_rest);
-    
-    X_prep = arm_pref_m1_ic.prep;
-    Y_prep = log10(max(modulation_m1_ic.prep,[],2));
-    idx = X_prep>0 & ~isnan(X_prep) & Y_prep>-1;
-    X_prep = X_prep(idx);
-    Y_prep = Y_prep(idx);
-    n_prep = length(X_prep);
-    
-    X_move = arm_pref_m1_ic.move;
-    Y_move = log10(max(modulation_m1_ic.move,[],2));
-    idx = X_move>0 & ~isnan(X_move) & Y_move>-1;
-    X_move = X_move(idx);
-    Y_move = Y_move(idx);
-    n_move = length(X_move);
-    
-    X_rp = [X_rest; X_prep];
-    Y_rp = [Y_rest; Y_prep];
-    r_idx = randi(length(X_rp), n_rest,1);
-    X_rp_r = X_rp(r_idx);
-    Y_rp_r = Y_rp(r_idx);
-    X_rp_p = X_rp(setdiff(1:length(X_rp),r_idx));
-    Y_rp_p = Y_rp(setdiff(1:length(Y_rp),r_idx));
-    b_r = polyfit(X_rp_r, Y_rp_r, 1);
-    b_p = polyfit(X_rp_p, Y_rp_p, 1);
-    slope_m1_contra_rp(perm,1) = b_p(1) - b_r(1);
-    
-    X_rm = [X_rest; X_move];
-    Y_rm = [Y_rest; X_move];
-    r_idx = randi(length(X_rm), n_rest,1);
-    X_rm_r = X_rm(r_idx);
-    Y_rm_r = Y_rm(r_idx);
-    X_rm_m = X_rm(setdiff(1:length(X_rm),r_idx));
-    Y_rm_m = Y_rm(setdiff(1:length(Y_rm),r_idx));
-    b_r = polyfit(X_rm_r, Y_rm_r, 1);
-    b_m = polyfit(X_rm_m, Y_rm_m, 1);
-    slope_m1_contra_rm(perm,1) = b_m(1) - b_r(1);
-    
-    X_pm = [X_prep; X_move];
-    Y_pm = [Y_prep; X_move];
-    p_idx = randi(length(X_pm), n_prep,1);
-    X_pm_p = X_pm(p_idx);
-    Y_pm_p = Y_pm(p_idx);
-    X_pm_m = X_pm(setdiff(1:length(X_pm),p_idx));
-    Y_pm_m = Y_pm(setdiff(1:length(Y_pm),p_idx));
-    b_p = polyfit(X_pm_p, Y_pm_p, 1);
-    b_m = polyfit(X_pm_m, Y_pm_m, 1);
-    slope_m1_contra_pm(perm,1) = b_m(1) - b_p(1);
-    
-end
-
-% record observed differences in slope
-
-X_rest = arm_pref_pmd_ic.rest;
-Y_rest = log10(max(modulation_pmd_ic.rest,[],2));
-idx = X_rest<0 & ~isnan(X_rest) & Y_rest>-1;
-X_rest = X_rest(idx);
-Y_rest = Y_rest(idx);
-b_r_pmd_ipsi = polyfit(X_rest, Y_rest, 1);
-
-X_prep = arm_pref_pmd_ic.prep;
-Y_prep = log10(max(modulation_pmd_ic.prep,[],2));
-idx = X_prep<0 & ~isnan(X_prep) & Y_prep>-1;
-X_prep = X_prep(idx);
-Y_prep = Y_prep(idx);
-b_p_pmd_ipsi = polyfit(X_prep, Y_prep, 1);
-
-X_move = arm_pref_pmd_ic.move;
-Y_move = log10(max(modulation_pmd_ic.move,[],2));
-idx = X_move<0 & ~isnan(X_move) & Y_move>-1;
-X_move = X_move(idx);
-Y_move = Y_move(idx);
-b_m_pmd_ipsi = polyfit(X_move, Y_move, 1);
-
-X_rest = arm_pref_pmd_ic.rest;
-Y_rest = log10(max(modulation_pmd_ic.rest,[],2));
-idx = X_rest>0 & ~isnan(X_rest) & Y_rest>-1;
-X_rest = X_rest(idx);
-Y_rest = Y_rest(idx);
-b_r_pmd_contra = polyfit(X_rest, Y_rest, 1);
-
-X_prep = arm_pref_pmd_ic.prep;
-Y_prep = log10(max(modulation_pmd_ic.prep,[],2));
-idx = X_prep>0 & ~isnan(X_prep) & Y_prep>-1;
-X_prep = X_prep(idx);
-Y_prep = Y_prep(idx);
-b_p_pmd_contra = polyfit(X_prep, Y_prep, 1);
-
-X_move = arm_pref_pmd_ic.move;
-Y_move = log10(max(modulation_pmd_ic.move,[],2));
-idx = X_move>0 & ~isnan(X_move) & Y_move>-1;
-X_move = X_move(idx);
-Y_move = Y_move(idx);
-b_m_pmd_contra = polyfit(X_move, Y_move, 1);
-
-X_rest = arm_pref_m1_ic.rest;
-Y_rest = log10(max(modulation_m1_ic.rest,[],2));
-idx = X_rest<0 & ~isnan(X_rest) & Y_rest>-1;
-X_rest = X_rest(idx);
-Y_rest = Y_rest(idx);
-b_r_m1_ipsi = polyfit(X_rest, Y_rest, 1);
-
-X_prep = arm_pref_m1_ic.prep;
-Y_prep = log10(max(modulation_m1_ic.prep,[],2));
-idx = X_prep<0 & ~isnan(X_prep) & Y_prep>-1;
-X_prep = X_prep(idx);
-Y_prep = Y_prep(idx);
-b_p_m1_ipsi = polyfit(X_prep, Y_prep, 1);
-
-X_move = arm_pref_m1_ic.move;
-Y_move = log10(max(modulation_m1_ic.move,[],2));
-idx = X_move<0 & ~isnan(X_move) & Y_move>-1;
-X_move = X_move(idx);
-Y_move = Y_move(idx);
-b_m_m1_ipsi = polyfit(X_move, Y_move, 1);
-
-X_rest = arm_pref_m1_ic.rest;
-Y_rest = log10(max(modulation_m1_ic.rest,[],2));
-idx = X_rest>0 & ~isnan(X_rest) & Y_rest>-1;
-X_rest = X_rest(idx);
-Y_rest = Y_rest(idx);
-b_r_m1_contra = polyfit(X_rest, Y_rest, 1);
-
-X_prep = arm_pref_m1_ic.prep;
-Y_prep = log10(max(modulation_m1_ic.prep,[],2));
-idx = X_prep>0 & ~isnan(X_prep) & Y_prep>-1;
-X_prep = X_prep(idx);
-Y_prep = Y_prep(idx);
-b_p_m1_contra = polyfit(X_prep, Y_prep, 1);
-
-X_move = arm_pref_m1_ic.move;
-Y_move = log10(max(modulation_m1_ic.move,[],2));
-idx = X_move>0 & ~isnan(X_move) & Y_move>-1;
-X_move = X_move(idx);
-Y_move = Y_move(idx);
-b_m_m1_contra = polyfit(X_move, Y_move, 1);
-
-% assign p-value based on number of permutations that have equal or more
-% extreme differences in slope
-p_pmd_ipsi_rp = sum(abs(slope_pmd_ipsi_rp)>...
-    abs(b_r_pmd_ipsi(1)-b_p_pmd_ipsi(1)))/10000;
-p_pmd_ipsi_rm = sum(abs(slope_pmd_ipsi_rm)>...
-    abs(b_r_pmd_ipsi(1)-b_m_pmd_ipsi(1)))/10000;
-p_pmd_ipsi_pm = sum(abs(slope_pmd_ipsi_pm)>...
-    abs(b_p_pmd_ipsi(1)-b_m_pmd_ipsi(1)))/10000;
-
-p_pmd_contra_rp = sum(abs(slope_pmd_contra_rp)>...
-    abs(b_r_pmd_contra(1)-b_p_pmd_contra(1)))/10000;
-p_pmd_contra_rm = sum(abs(slope_pmd_contra_rm)>...
-    abs(b_r_pmd_contra(1)-b_m_pmd_contra(1)))/10000;
-p_pmd_contra_pm = sum(abs(slope_pmd_contra_pm)>...
-    abs(b_p_pmd_contra(1)-b_m_pmd_contra(1)))/10000;
-
-p_m1_ipsi_rp = sum(abs(slope_m1_ipsi_rp)>...
-    abs(b_r_m1_ipsi(1)-b_p_m1_ipsi(1)))/10000;
-p_m1_ipsi_rm = sum(abs(slope_m1_ipsi_rm)>...
-    abs(b_r_m1_ipsi(1)-b_m_m1_ipsi(1)))/10000;
-p_m1_ipsi_pm = sum(abs(slope_m1_ipsi_pm)>...
-    abs(b_p_m1_ipsi(1)-b_m_m1_ipsi(1)))/10000;
-
-p_m1_contra_rp = sum(abs(slope_m1_contra_rp)>...
-    abs(b_r_m1_contra(1)-b_p_m1_contra(1)))/10000;
-p_m1_contra_rm = sum(abs(slope_m1_contra_rm)>...
-    abs(b_r_m1_contra(1)-b_m_m1_contra(1)))/10000;
-p_m1_contra_pm = sum(abs(slope_m1_contra_pm)>...
-    abs(b_p_m1_contra(1)-b_m_m1_contra(1)))/10000;
 
 % plot
 figure('Name', 'Slope of arm dedication, MD relationship across epochs')
@@ -1939,3 +1476,39 @@ hYLabel = get(gca,'YLabel');
 set(hYLabel,'rotation',0,'VerticalAlignment','middle', 'HorizontalAlignment','right')
 legend({'Ipsi','Contra'})
 title('MD dist across phases')
+
+
+%% local functions
+
+    function slope = compute_bs_slope(X, Y, contra_ipsi)
+    % cleans arm pref and modulation data, then computes the slope of their
+    % relationship
+    
+    % select the preferred arm modulation, then take the log of those
+    % modulation values and the absolute value of the arm preferences
+    pref_idx = sub2ind([length(X),2], (1:length(X))', (X>0)+1);
+    Y = log10(Y(pref_idx));
+    
+    % select only units that prefer the arm designated by input
+    % (contra_ipsi) and remove units with small modulation, which are not  
+    % meaningful and would dominate the regression if not accounted for.
+    if strcmp(contra_ipsi, 'contra')
+        ic_idx = X>0 & Y>-1;
+    elseif strcmp(contra_ipsi, 'ipsi')
+        ic_idx = X<0 & Y>-1;
+    end    
+    X = abs(X(ic_idx));
+    Y = Y(ic_idx);
+
+    % bootstrap a new data sample and compute the slope
+    [X, sample_idx] = datasample(X, length(X), 'Replace',true);
+    Y = Y(sample_idx);
+    b = polyfit(X,Y,1);
+    slope = b(1);
+
+    end
+
+end
+
+
+
