@@ -14,14 +14,14 @@ function [] = plot_arm_pref(unit_data)
 % OUTPUTS:
 %
 % Plots:
-% 1 - Emprical CDF's for modulation strength for each brain area x hand x
+% 1 - Emprical CDF's of modulation strength for each brain area x hand x
 %     task phase
 %
 % 2:9 - Arm preference distributions visualized in different forms
 %
-% 10:12 - Modulation strength vs arm preference visualizations
+% 10:14 - Modulation strength vs arm preference visualizations
 %
-% 13:22 - Cumulative modulation accounted for across arm preference
+% 15:24 - Cumulative modulation accounted for across arm preference
 %         spectrum
 %
 
@@ -138,42 +138,53 @@ set(gcf, 'Position',  [2000, 200, 500, 600])
 
 % PMd
 subplot(2,1,1)
-[pmd_contra_move_ecdf, x_contra] = ecdf(-log10(modulation_pmd_ic.move(:,2)));
-[pmd_ipsi_move_ecdf, x_ipsi] = ecdf(-log10(modulation_pmd_ic.move(:,1)));
+[pmd_contra_move_ecdf, x_contra] = ecdf(log10(modulation_pmd_ic.move(:,2)));
+[pmd_ipsi_move_ecdf, x_ipsi] = ecdf(log10(modulation_pmd_ic.move(:,1)));
 plot(x_contra, pmd_contra_move_ecdf, 'b:')
 hold on
 plot(x_ipsi, pmd_ipsi_move_ecdf, 'r:')
-[pmd_contra_prep_ecdf, x_contra] = ecdf(-log10(modulation_pmd_ic.prep(:,2)));
-[pmd_ipsi_prep_ecdf, x_ipsi] = ecdf(-log10(modulation_pmd_ic.prep(:,1)));
+[pmd_contra_prep_ecdf, x_contra] = ecdf(log10(modulation_pmd_ic.prep(:,2)));
+[pmd_ipsi_prep_ecdf, x_ipsi] = ecdf(log10(modulation_pmd_ic.prep(:,1)));
 plot(x_contra,pmd_contra_prep_ecdf, 'b--')
 plot(x_ipsi, pmd_ipsi_prep_ecdf, 'r--')
-[pmd_contra_rest_ecdf, x_contra] = ecdf(-log10(modulation_pmd_ic.rest(:,2)));
-[pmd_ipsi_rest_ecdf, x_ipsi] = ecdf(-log10(modulation_pmd_ic.rest(:,1)));
+[pmd_contra_rest_ecdf, x_contra] = ecdf(log10(modulation_pmd_ic.rest(:,2)));
+[pmd_ipsi_rest_ecdf, x_ipsi] = ecdf(log10(modulation_pmd_ic.rest(:,1)));
 plot(x_contra,pmd_contra_rest_ecdf, 'b')
 plot(x_ipsi, pmd_ipsi_rest_ecdf, 'r')
-xlim([-2, 1])
-xlabel('modulation Depth')
-ylabel('F')
+xt = log10([0.1:0.1:0.9, 1:9, 10:10:100]);
+xticks(xt)
+xtl = cell(size(xt));
+xtl([1,10,19,28]) = {'10^{-1}','1','10','10^2'};
+xticklabels(xtl)
+xlim([-1, 2])
+xlabel('Modulation strength')
+grid on
 title('PMd')
 
 % M1
 subplot(2,1,2)
-[m1_contra_move_ecdf, x_contra] = ecdf(-log10(modulation_m1_ic.move(:,2)));
-[m1_ipsi_move_ecdf, x_ipsi] = ecdf(-log10(modulation_m1_ic.move(:,1)));
+[m1_contra_move_ecdf, x_contra] = ecdf(log10(modulation_m1_ic.move(:,2)));
+[m1_ipsi_move_ecdf, x_ipsi] = ecdf(log10(modulation_m1_ic.move(:,1)));
 plot(x_contra,m1_contra_move_ecdf, 'b:')
 hold on
 plot(x_ipsi, m1_ipsi_move_ecdf, 'r:')
-[m1_contra_prep_ecdf, x_contra] = ecdf(-log10(modulation_m1_ic.prep(:,2)));
-[m1_ipsi_prep_ecdf, x_ipsi] = ecdf(-log10(modulation_m1_ic.prep(:,1)));
+[m1_contra_prep_ecdf, x_contra] = ecdf(log10(modulation_m1_ic.prep(:,2)));
+[m1_ipsi_prep_ecdf, x_ipsi] = ecdf(log10(modulation_m1_ic.prep(:,1)));
 plot(x_contra,m1_contra_prep_ecdf, 'b--')
 plot(x_ipsi, m1_ipsi_prep_ecdf, 'r--')
-[m1_contra_rest_ecdf, x_contra] = ecdf(-log10(modulation_m1_ic.rest(:,2)));
-[m1_ipsi_rest_ecdf, x_ipsi] = ecdf(-log10(modulation_m1_ic.rest(:,1)));
+[m1_contra_rest_ecdf, x_contra] = ecdf(log10(modulation_m1_ic.rest(:,2)));
+[m1_ipsi_rest_ecdf, x_ipsi] = ecdf(log10(modulation_m1_ic.rest(:,1)));
 plot(x_contra,m1_contra_rest_ecdf, 'b')
 plot(x_ipsi, m1_ipsi_rest_ecdf, 'r')
-xlim([-2, 1])
-xlabel('modulation Depth')
+xt = log10([0.1:0.1:0.9, 1:9, 10:10:100]);
+xticks(xt)
+xtl = cell(size(xt));
+xtl([1,10,19,28]) = {'10^{-1}','1','10','10^2'};
+xticklabels(xtl)
+xlim([-1, 2])
+xlabel('Modulation strength')
 ylabel('F')
+grid on
 title('M1')
 
 legend({'Contra Move','Ipsi Move','Contra Instruct','Ipsi Instruct',...
@@ -833,10 +844,14 @@ for k = 1:6
     a = get(gca,'XTickLabel');
     set(gca,'XTickLabel',a,'FontName','Helvetica','fontsize',14)
     yticklabels({'10^0','10^1','10^2'})
-    ylabel(region,'fontweight','bold','fontsize',24)
-    title(phase,'fontsize',24)
-    hYLabel = get(gca,'YLabel');
-    set(hYLabel,'rotation',0,'VerticalAlignment','middle')
+    if any([1,4]==k)
+        ylabel(region,'fontweight','bold','fontsize',24)
+        hYLabel = get(gca,'YLabel');
+        set(hYLabel,'rotation',0,'VerticalAlignment','middle')
+    end
+    if k<4
+        title(phase,'fontsize',24)
+    end
     grid on
     
 end
@@ -912,10 +927,14 @@ for k = 1:6
     a = get(gca,'XTickLabel');
     set(gca,'XTickLabel',a,'FontName','Helvetica','fontsize',14)
     yticklabels({'10^0','10^1','10^2'})
-    ylabel(region,'fontweight','bold','fontsize',24)
-    title(phase,'fontsize',24)
-    hYLabel = get(gca,'YLabel');
-    set(hYLabel,'rotation',0,'VerticalAlignment','middle')
+    if any([1,4]==k)
+        ylabel(region,'fontweight','bold','fontsize',24)
+        hYLabel = get(gca,'YLabel');
+        set(hYLabel,'rotation',0,'VerticalAlignment','middle')
+    end
+    if k<4
+        title(phase,'fontsize',24)
+    end
     grid on
     
 end
