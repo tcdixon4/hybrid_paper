@@ -1,4 +1,4 @@
-function [arm_pref, modulation, mu_rest, sigma_rest, p_mod]...
+function [arm_pref, modulation, mu_rest, sigma_rest, p]...
     = calc_limb_dedication(unit_data, config)
 
 %
@@ -8,61 +8,48 @@ function [arm_pref, modulation, mu_rest, sigma_rest, p_mod]...
 %
 % INPUTS: 
 %
-% unit_data - unit-separated data struct containing hemisphere, brain area,
+% unit_data - struct: 1 x num_units
+%             unit-separated data struct containing hemisphere, brain area,
 %             firing rate and other metrics
-%             (struct: 1 x num_units)
 %
 % OUTPUTS:
 %
-% arm_pref - arm preference, scalar for each unit x phase. positive values
+% arm_pref - struct: 1x1, fields 'rest', 'prep', 'move'
+%            arm preference, scalar for each unit x phase. positive values
 %            are right preferring
-%            (struct: 1x1, fields 'rest', 'prep', 'move'
-%             nested vector: num_units x 1)
+%                nested vector: num_units x 1
 % 
-% modulation - modulation strength, scalar for each unit x phase x hand
-%              (struct: 1x1, fields 'rest', 'prep', 'move'
-%               nested matrix: num_units x 2, col 1 left hand, col 2 right)
+% modulation - struct: 1x1, fields 'rest', 'prep', 'move'
+%              modulation strength, scalar for each unit x phase x hand
+%                  nested matrix: num_units x 2
+%                  col 1 left hand, col 2 right
 % 
-% mu_rest - mean firing rate at rest, scalar for each unit
-%           (vector: num_units x 1)
+% mu_rest - vector: num_units x 1
+%           mean firing rate at rest, scalar for each unit
 % 
-% sigma_rest - standard deviation of firing rate at rest, softened by 
+% sigma_rest - vector: num_units x 1
+%              standard deviation of firing rate at rest, softened by 
 %              adding 1, scalar for each unit
-%              (vector: num_units x 1)
 % 
-% p_mod - p-values for modulation differences
-%         (struct: 1x1, fields 'ipsi', 'contra', 'hand_discrim_rest',
-%              'd_hand'
-%          nested in ipsi/contra, struct: 1x1, fields 'prep', 'move'
-%              nested vector: num_units x 1, p-vals for mod above rest)
-%          hand_discrim_rest vector: num_units x 1, p-vals for mod
-%              differences between hands at rest
-%          d_hand vector: 1 x num_units, difference in mean firing rate 
-%              between hands at rest, abs value
+% p - struct: 1x1, fields 'ipsi', 'contra', 'ap', 'd_hand'
+%          'ipsi','contra', struct: 1x1
+%              nested struct: 1x1, fields 'prep', 'move'
+%                  nested vector: num_units x 1 
+%                  p-vals for modulation above rest
+%          'ap', struct: 1x1, fields 'rest', 'prep', and 'move'
+%              nested vector: num_units x 1
+%              p-vals for modulation differences between hands
+%          'd_hand', vector: 1 x num_units, 
+%              difference in mean firing rate between hands at rest, abs
 %
 
 
-%% Set up data matrices and helper variables
+%% Set up helper variables
 
 num_units = length(unit_data);
 % create indexing vectors for each hemisphere
 left_hem_idx = [unit_data.hem]==0;
 right_hem_idx = [unit_data.hem]==1;
-% preallocate
-arm_pref.rest = zeros(num_units,1);
-modulation.rest = zeros(num_units,1);
-arm_pref.prep = zeros(num_units,1);
-modulation.prep = zeros(num_units,1);
-p_mod.ipsi.prep = zeros(num_units,1);
-p_mod.contra.prep = zeros(num_units,1);
-arm_pref.move = zeros(num_units,1);
-modulation.move = zeros(num_units,1);
-p_mod.ipsi.move = zeros(num_units,1);
-p_mod.contra.move = zeros(num_units,1);
-p_mod.hand_discrim_rest = zeros(num_units,1);
-
-ipsi = zeros(num_units,113);
-contra = zeros(num_units,113);
 
 
 %% Log average modulation across time for all units
@@ -125,17 +112,24 @@ for unit = num_units:-1:1
     ipsi_move = z_ipsi(1:trials_to_use, 63:78).^2;
     contra_move = z_contra(1:trials_to_use, 63:78).^2;
     
-    [~, p_mod.ipsi.prep(unit)] = ttest2(mean(ipsi_prep,2),...
+    % run two-sample t-tests for each comparison
+    [~, p.ipsi.prep(unit)] = ttest2(mean(ipsi_prep,2),...
         [mean(ipsi_rest,2);mean(contra_rest,2)]);
-    [~, p_mod.contra.prep(unit)] = ttest2(mean(contra_prep,2),...
+    [~, p.contra.prep(unit)] = ttest2(mean(contra_prep,2),...
         [mean(ipsi_rest,2);mean(contra_rest,2)]);
-    [~, p_mod.ipsi.move(unit)] = ttest2(mean(ipsi_move,2),...
+    [~, p.ipsi.move(unit)] = ttest2(mean(ipsi_move,2),...
         [mean(ipsi_rest,2);mean(contra_rest,2)]);
-    [~, p_mod.contra.move(unit)] = ttest2(mean(contra_move,2),...
+    [~, p.contra.move(unit)] = ttest2(mean(contra_move,2),...
         [mean(ipsi_rest,2);mean(contra_rest,2)]);
-    [~, p_mod.hand_discrim_rest(unit)] = ...
-        ttest2(mean(fr_ipsi(:, 11:26),2), mean(fr_contra(:, 11:26),2));
-    p_mod.d_hand(unit) = abs(...
+    p.ap.rest(unit) = ...
+        ranksum(mean(fr_ipsi(:, 11:26),2), mean(fr_contra(:, 11:26),2));
+    p.ap.prep(unit) = ...
+        ranksum(mean(fr_ipsi(:, 37:52),2), mean(fr_contra(:, 37:52),2));
+    p.ap.move(unit) = ...
+        ranksum(mean(fr_ipsi(:, 63:78),2), mean(fr_contra(:, 63:78),2));
+    % log difference in firing rate at rest. this is an odd place to have
+    % this, but it was helpful for a minor analysis
+    p.d_hand(unit) = abs(...
         mean(mean(fr_ipsi(:, 11:26),2)) - ...
         mean(mean(fr_contra(:, 11:26),2)));
     
