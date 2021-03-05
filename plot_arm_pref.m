@@ -17,11 +17,11 @@ function [] = plot_arm_pref(unit_data)
 % 1 - Emprical CDF's of modulation strength for each brain area x hand x
 %     task phase
 %
-% 2:9 - Arm preference distributions visualized in different forms
+% 2:10 - Arm preference distributions visualized in different forms
 %
-% 10:14 - Modulation strength vs arm preference visualizations
+% 11:15 - Modulation strength vs arm preference visualizations
 %
-% 15:24 - Cumulative modulation accounted for across arm preference
+% 16:25 - Cumulative modulation accounted for across arm preference
 %         spectrum
 %
 
@@ -48,84 +48,100 @@ for unit = length(m1):-1:1
     modulation_m1_lr.rest(unit,:) = m1(unit).modulation.rest;
     modulation_m1_lr.prep(unit,:) = m1(unit).modulation.prep;
     modulation_m1_lr.move(unit,:) = m1(unit).modulation.move;
+    modulation_m1_lr.extend(unit,:) = m1(unit).modulation.extend;
     
     arm_pref_m1_lr.rest(unit,:) = m1(unit).arm_pref.rest;
     arm_pref_m1_lr.prep(unit,:) = m1(unit).arm_pref.prep;
     arm_pref_m1_lr.move(unit,:) = m1(unit).arm_pref.move;
+    arm_pref_m1_lr.extend(unit,:) = m1(unit).arm_pref.extend;
     
-    p_mod_m1.ipsi.prep(unit) = m1(unit).p_mod.ipsi.prep;
-    p_mod_m1.contra.prep(unit) = m1(unit).p_mod.contra.prep;
-    p_mod_m1.ipsi.move(unit) = m1(unit).p_mod.ipsi.move;
-    p_mod_m1.contra.move(unit) = m1(unit).p_mod.contra.move;
+    sig_mod_m1.ipsi.prep(unit) = m1(unit).p_mod.ipsi.prep<0.05;
+    sig_mod_m1.contra.prep(unit) = m1(unit).p_mod.contra.prep<0.05;
+    sig_mod_m1.ipsi.move(unit) = m1(unit).p_mod.ipsi.move<0.05;
+    sig_mod_m1.contra.move(unit) = m1(unit).p_mod.contra.move<0.05;
     
     if m1(unit).hem == 0
         modulation_m1_ic.rest(unit,:) = m1(unit).modulation.rest;
         modulation_m1_ic.prep(unit,:) = m1(unit).modulation.prep;
         modulation_m1_ic.move(unit,:) = m1(unit).modulation.move;
+        modulation_m1_ic.extend(unit,:) = m1(unit).modulation.extend;
         
         arm_pref_m1_ic.rest(unit,:) = m1(unit).arm_pref.rest;
         arm_pref_m1_ic.prep(unit,:) = m1(unit).arm_pref.prep;
         arm_pref_m1_ic.move(unit,:) = m1(unit).arm_pref.move;
+        arm_pref_m1_ic.extend(unit,:) = m1(unit).arm_pref.extend;
     elseif m1(unit).hem == 1
         arm_pref_m1_ic.rest(unit,:) = -m1(unit).arm_pref.rest;
         arm_pref_m1_ic.prep(unit,:) = -m1(unit).arm_pref.prep;
         arm_pref_m1_ic.move(unit,:) = -m1(unit).arm_pref.move;
+        arm_pref_m1_ic.extend(unit,:) = -m1(unit).arm_pref.extend;
         
         modulation_m1_ic.rest(unit,:) = fliplr(m1(unit).modulation.rest);
         modulation_m1_ic.prep(unit,:) = fliplr(m1(unit).modulation.prep);
         modulation_m1_ic.move(unit,:) = fliplr(m1(unit).modulation.move);
+        modulation_m1_ic.extend(unit,:) = fliplr(m1(unit).modulation.extend);
     end
 end
 
 arm_pref_m1_ic_idx.rest = arm_pref_m1_ic.rest > 1;
 arm_pref_m1_ic_idx.prep = arm_pref_m1_ic.prep > 1;
 arm_pref_m1_ic_idx.move = arm_pref_m1_ic.move > 1;
+arm_pref_m1_ic_idx.extend = arm_pref_m1_ic.extend > 1;
 
 arm_pref_m1_lr_idx.rest = arm_pref_m1_lr.rest > 1;
 arm_pref_m1_lr_idx.prep = arm_pref_m1_lr.prep > 1;
 arm_pref_m1_lr_idx.move = arm_pref_m1_lr.move > 1;
+arm_pref_m1_lr_idx.extend = arm_pref_m1_lr.extend > 1;
 
 % PMd
 for unit = length(pmd):-1:1
     modulation_pmd_lr.rest(unit,:) = pmd(unit).modulation.rest;
     modulation_pmd_lr.prep(unit,:) = pmd(unit).modulation.prep;
     modulation_pmd_lr.move(unit,:) = pmd(unit).modulation.move;
+    modulation_pmd_lr.extend(unit,:) = pmd(unit).modulation.extend;
     
     arm_pref_pmd_lr.rest(unit,:) = pmd(unit).arm_pref.rest;
     arm_pref_pmd_lr.prep(unit,:) = pmd(unit).arm_pref.prep;
     arm_pref_pmd_lr.move(unit,:) = pmd(unit).arm_pref.move;
+    arm_pref_pmd_lr.extend(unit,:) = pmd(unit).arm_pref.extend;
     
-    p_mod_pmd.ipsi.prep(unit) = pmd(unit).p_mod.ipsi.prep;
-    p_mod_pmd.contra.prep(unit) = pmd(unit).p_mod.contra.prep;
-    p_mod_pmd.ipsi.move(unit) = pmd(unit).p_mod.ipsi.move;
-    p_mod_pmd.contra.move(unit) = pmd(unit).p_mod.contra.move;
+    sig_mod_pmd.ipsi.prep(unit) = pmd(unit).p_mod.ipsi.prep<0.05;
+    sig_mod_pmd.contra.prep(unit) = pmd(unit).p_mod.contra.prep<0.05;
+    sig_mod_pmd.ipsi.move(unit) = pmd(unit).p_mod.ipsi.move<0.05;
+    sig_mod_pmd.contra.move(unit) = pmd(unit).p_mod.contra.move<0.05;
     
     if pmd(unit).hem == 0
         modulation_pmd_ic.rest(unit,:) = pmd(unit).modulation.rest;
         modulation_pmd_ic.prep(unit,:) = pmd(unit).modulation.prep;
         modulation_pmd_ic.move(unit,:) = pmd(unit).modulation.move;
+        modulation_pmd_ic.extend(unit,:) = pmd(unit).modulation.extend;
         
         arm_pref_pmd_ic.rest(unit,:) = pmd(unit).arm_pref.rest;
         arm_pref_pmd_ic.prep(unit,:) = pmd(unit).arm_pref.prep;
         arm_pref_pmd_ic.move(unit,:) = pmd(unit).arm_pref.move;
+        arm_pref_pmd_ic.extend(unit,:) = pmd(unit).arm_pref.extend;
     elseif pmd(unit).hem == 1
         arm_pref_pmd_ic.rest(unit,:) = -pmd(unit).arm_pref.rest;
         arm_pref_pmd_ic.prep(unit,:) = -pmd(unit).arm_pref.prep;
         arm_pref_pmd_ic.move(unit,:) = -pmd(unit).arm_pref.move;
+        arm_pref_pmd_ic.extend(unit,:) = -pmd(unit).arm_pref.extend;
         
         modulation_pmd_ic.rest(unit,:) = fliplr(pmd(unit).modulation.rest);
         modulation_pmd_ic.prep(unit,:) = fliplr(pmd(unit).modulation.prep);
         modulation_pmd_ic.move(unit,:) = fliplr(pmd(unit).modulation.move);
+        modulation_pmd_ic.extend(unit,:) = fliplr(pmd(unit).modulation.extend);
     end
 end
 
 arm_pref_pmd_ic_idx.rest = arm_pref_pmd_ic.rest > 1;
 arm_pref_pmd_ic_idx.prep = arm_pref_pmd_ic.prep > 1;
 arm_pref_pmd_ic_idx.move = arm_pref_pmd_ic.move > 1;
+arm_pref_pmd_ic_idx.extend = arm_pref_pmd_ic.extend > 1;
 
 arm_pref_pmd_lr_idx.rest = arm_pref_pmd_lr.rest > 1;
 arm_pref_pmd_lr_idx.prep = arm_pref_pmd_lr.prep > 1;
 arm_pref_pmd_lr_idx.move = arm_pref_pmd_lr.move > 1;
+arm_pref_pmd_lr_idx.extend = arm_pref_pmd_lr.extend > 1;
 
 % clear unit_data since it is very large
 % clearvars m1 pmd
@@ -526,9 +542,9 @@ pos_pmd = [boot_mean_pmd_rest(end-25), boot_mean_pmd_prep(end-25), ...
 
 figure('Name', 'Lateral bias across epochs')
 set(gcf, 'Position',  [2000, 200, 500, 250])
-errorbar([1:3]-0.05, Y_pmd, neg_pmd, pos_pmd, 'o-', 'LineWidth',1.5)
+errorbar((1:3)-0.05, Y_pmd, neg_pmd, pos_pmd, 'o-', 'LineWidth',1.5)
 hold on
-errorbar([1:3]+0.05, Y_m1, neg_m1, pos_m1, 'o-', 'LineWidth',1.5)
+errorbar((1:3)+0.05, Y_m1, neg_m1, pos_m1, 'o-', 'LineWidth',1.5)
 xlim([0.5, 3.5])
 xticks([1,2,3])
 xticklabels({'Rest','Prep','Move'})
@@ -601,9 +617,9 @@ pos_pmd = [boot_mean_pmd_rest(end-25), boot_mean_pmd_prep(end-25), ...
 
 figure('Name', 'Arm dedication across epochs')
 set(gcf, 'Position',  [2000, 200, 500, 250])
-errorbar([1:3]-0.05, Y_pmd, neg_pmd, pos_pmd, 'o-', 'LineWidth',1.5)
+errorbar((1:3)-0.05, Y_pmd, neg_pmd, pos_pmd, 'o-', 'LineWidth',1.5)
 hold on
-errorbar([1:3]+0.05, Y_m1, neg_m1, pos_m1, 'o-', 'LineWidth',1.5)
+errorbar((1:3)+0.05, Y_m1, neg_m1, pos_m1, 'o-', 'LineWidth',1.5)
 xlim([0.5, 3.5])
 xticks([1,2,3])
 xticklabels({'Rest','Prep','Move'})
@@ -615,6 +631,60 @@ yticks([0,0.7])
 hYLabel = get(gca,'YLabel');
 set(hYLabel,'rotation',0,'VerticalAlignment','middle', 'HorizontalAlignment','right')
 legend({'PMd','M1'})
+
+
+%% plot scatter of Instruct vs Move phase arm pref
+
+figure('Name', 'Instruct vs Move phase arm preferences');
+set(gcf, 'Position',  [2000, 0, 400, 800])
+
+subplot(2,1,1)
+pbaspect([1 1 1])
+% only include units that were significantly modulated for at least one arm
+% in both phases
+idx = (sig_mod_pmd.ipsi.prep|sig_mod_pmd.contra.prep)...
+    & (sig_mod_pmd.ipsi.move|sig_mod_pmd.contra.move);
+X = arm_pref_pmd_ic.prep(idx);
+Y = arm_pref_pmd_ic.move(idx);
+scatter(X, Y, 'filled');
+% plot fit line, r, and p-value of linear correlation
+hold on
+p = polyfit(X,Y,1);
+f = polyval(p,[-1,1]);
+plot([-1,1],f,'r', 'LineWidth',1.5)
+[r, p] = corr(X,Y);
+tb = {['r=', num2str(r)];['p=', num2str(p)]};
+annotation('textbox', [0.5, 0.8, 0.1, 0.1], 'String', tb)
+title('PMd');
+xlabel('Instruct Arm Preference');
+xticks(-1:1)
+ylabel('Move Arm Preference');
+yticks(-1:1)
+grid on
+
+subplot(2,1,2)
+pbaspect([1 1 1])
+% only include units that were significantly modulated for at least one arm
+% in both phases
+idx = (sig_mod_m1.ipsi.prep|sig_mod_m1.contra.prep)...
+    & (sig_mod_m1.ipsi.move|sig_mod_m1.contra.move);
+X = arm_pref_m1_ic.prep(idx);
+Y = arm_pref_m1_ic.move(idx);
+scatter(X, Y, 'filled');
+% plot fit line, r, and p-value of linear correlation
+hold on
+p = polyfit(X,Y,1);
+f = polyval(p,[-1,1]);
+plot([-1,1],f,'r', 'LineWidth',1.5)
+[r, p] = corr(X,Y);
+tb = {['r=', num2str(r)];['p=', num2str(p)]};
+annotation('textbox', [0.5, 0.2, 0.1, 0.1], 'String', tb)
+title('M1');
+xlabel('Instruct Arm Preference');
+xticks(-1:1)
+ylabel('Move Arm Preference');
+yticks(-1:1)
+grid on
 
 
 %% plot scatter of arm pref vs preferred limb MD
@@ -940,6 +1010,65 @@ for k = 1:6
 end
 
 
+%% plot scatter of absolute arm pref vs preferred limb MD - include return
+
+figure('Name', ...
+    'Absolute arm preference vs preferred limb MD - include return')
+set(gcf, 'Position',  [2000, 200, 1000, 600])
+
+for k = 1:2
+    % assign arm pref and modulation data for current area and phase combo
+    phase = 'Extended';
+    switch k
+        case 1
+            X = arm_pref_pmd_ic.extend;
+            Y = modulation_pmd_ic.extend;
+            region = 'PMd';
+        case 2
+            X = arm_pref_m1_ic.extend;
+            Y = modulation_m1_ic.extend;
+            region = 'M1';           
+    end
+    
+    % select the preferred arm modulation, then take the log of those
+    % modulation values and the absolute value of the arm preferences
+    pref_idx = sub2ind([length(X),2], (1:length(X))', (X>0)+1);
+    X = abs(X);
+    Y = log10(Y(pref_idx));
+    
+    % remove units that have nan arm pref (rare) or units that have very
+    % small modulation. The latter will dominate the regression if not
+    % accounted for.
+    clean_idx = ~isnan(X) & Y>-1;
+    X = X(clean_idx);
+    Y = Y(clean_idx);
+    
+    % compute regression lines (log-linear)
+    p = polyfit(X,Y,1);
+    f = polyval(p,[-1,1]);
+
+    % plot
+    subplot(2,3,3*k-2)
+    scatter(X,Y)
+    hold on
+    plot([-1,1],f,'r', 'LineWidth',1.5)
+    % format display
+    xticks([0,0.5,1])
+    yticks([0,1,2])
+    xlim([-0.05,1.05])
+    ylim([-1,2.5])
+    a = get(gca,'XTickLabel');
+    set(gca,'XTickLabel',a,'FontName','Helvetica','fontsize',14)
+    yticklabels({'10^0','10^1','10^2'})
+    ylabel(region,'fontweight','bold','fontsize',24)
+    hYLabel = get(gca,'YLabel');
+    set(hYLabel,'rotation',0,'VerticalAlignment','middle')
+    title(phase,'fontsize',24)
+    grid on
+    
+end
+
+
 %% plot preferred arm modulation vs arm pref slopes across epochs
 
 % compute bootstrapped slopes to fill out distribution. 10,000 bootstraps
@@ -960,6 +1089,10 @@ for boot = 10000:-1:1
         arm_pref_pmd_ic.move, modulation_pmd_ic.move, 'ipsi', 'pref');
     slope_pmd_contra(boot,3) = compute_bs_slope(...
         arm_pref_pmd_ic.move, modulation_pmd_ic.move, 'contra', 'pref');
+    slope_pmd_ipsi(boot,4) = compute_bs_slope(...
+        arm_pref_pmd_ic.extend, modulation_pmd_ic.extend, 'ipsi', 'pref');
+    slope_pmd_contra(boot,4) = compute_bs_slope(...
+        arm_pref_pmd_ic.extend, modulation_pmd_ic.extend, 'contra', 'pref');
     
     % m1
     slope_m1_ipsi(boot,1) = compute_bs_slope(...
@@ -974,6 +1107,10 @@ for boot = 10000:-1:1
         arm_pref_m1_ic.move, modulation_m1_ic.move, 'ipsi', 'pref');
     slope_m1_contra(boot,3) = compute_bs_slope(...
         arm_pref_m1_ic.move, modulation_m1_ic.move, 'contra', 'pref');
+    slope_m1_ipsi(boot,4) = compute_bs_slope(...
+        arm_pref_m1_ic.extend, modulation_m1_ic.extend, 'ipsi', 'pref');
+    slope_m1_contra(boot,4) = compute_bs_slope(...
+        arm_pref_m1_ic.extend, modulation_m1_ic.extend, 'contra', 'pref');
 
 end
 
@@ -994,15 +1131,15 @@ pos_pmd_contra = -Y_pmd_contra + quantile(slope_pmd_contra, 0.975);
 pos_m1_ipsi = -Y_m1_ipsi + quantile(slope_m1_ipsi, 0.975);
 pos_m1_contra = -Y_m1_contra + quantile(slope_m1_contra, 0.975);
 
-% plot
+% plot main epochs
 figure('Name', 'Slope of arm pref, pref MD relationship across epochs')
 set(gcf, 'Position',  [200, 200, 350, 600])
 
 subplot(2,1,1)
-errorbar([1:3]-0.05, Y_pmd_ipsi, neg_pmd_ipsi, pos_pmd_ipsi, ...
+errorbar((1:3)-0.05, Y_pmd_ipsi(1:3), neg_pmd_ipsi(1:3), pos_pmd_ipsi(1:3), ...
     'o-', 'LineWidth',1.5)
 hold on
-errorbar([1:3]+0.05, Y_pmd_contra, neg_pmd_contra, pos_pmd_contra, ...
+errorbar((1:3)+0.05, Y_pmd_contra(1:3), neg_pmd_contra(1:3), pos_pmd_contra(1:3), ...
     'o-', 'LineWidth',1.5)
 xlim([0.5, 3.5])
 xticks([1,2,3])
@@ -1020,14 +1157,61 @@ ax = gca;
 ax.Clipping = 'off';
 
 subplot(2,1,2)
-errorbar([1:3]-0.05, Y_m1_ipsi, neg_m1_ipsi, pos_m1_ipsi, ...
+errorbar((1:3)-0.05, Y_m1_ipsi(1:3), neg_m1_ipsi(1:3), pos_m1_ipsi(1:3), ...
     'o-', 'LineWidth',1.5)
 hold on
-errorbar([1:3]+0.05, Y_m1_contra, neg_m1_contra, pos_m1_contra, ...
+errorbar((1:3)+0.05, Y_m1_contra(1:3), neg_m1_contra(1:3), pos_m1_contra(1:3), ...
     'o-', 'LineWidth',1.5)
 xlim([0.5, 3.5])
 xticks([1,2,3])
 xticklabels({'Rest','Prep','Move'})
+a = get(gca,'XTickLabel');
+set(gca,'XTickLabel',a,'FontName','Helvetica','fontsize',16)
+yticks([0,1])
+ylabel('Slope','fontsize',16)
+ylim([-0.6,1.6])
+hYLabel = get(gca,'YLabel');
+set(hYLabel,'rotation',0,'VerticalAlignment','middle', 'HorizontalAlignment','right')
+legend({'Ipsi','Contra'})
+title('M1')
+ax = gca;
+ax.Clipping = 'off';
+
+% plot extended control epoch only
+figure('Name', ...
+    'Slope of arm pref, pref MD relationship - Extended epoch control')
+set(gcf, 'Position',  [200, 200, 350, 600])
+
+subplot(2,1,1)
+errorbar(1.95, Y_pmd_ipsi(4), neg_pmd_ipsi(4), pos_pmd_ipsi(4), ...
+    'o-', 'LineWidth',1.5)
+hold on
+errorbar(2.05, Y_pmd_contra(4), neg_pmd_contra(4), pos_pmd_contra(4), ...
+    'o-', 'LineWidth',1.5)
+xlim([0.5, 3.5])
+xticks([1,2,3])
+xticklabels({'','Extended',''})
+a = get(gca,'XTickLabel');
+set(gca,'XTickLabel',a,'FontName','Helvetica','fontsize',16)
+yticks([0,1])
+ylabel('Slope','fontsize',16)
+ylim([-0.6,1.6])
+hYLabel = get(gca,'YLabel');
+set(hYLabel,'rotation',0,'VerticalAlignment','middle', 'HorizontalAlignment','right')
+legend({'Ipsi','Contra'})
+title('PMd')
+ax = gca;
+ax.Clipping = 'off';
+
+subplot(2,1,2)
+errorbar(1.95, Y_m1_ipsi(4), neg_m1_ipsi(4), pos_m1_ipsi(4), ...
+    'o-', 'LineWidth',1.5)
+hold on
+errorbar(2.05, Y_m1_contra(4), neg_m1_contra(4), pos_m1_contra(4), ...
+    'o-', 'LineWidth',1.5)
+xlim([0.5, 3.5])
+xticks([1,2,3])
+xticklabels({'','Extended',''})
 a = get(gca,'XTickLabel');
 set(gca,'XTickLabel',a,'FontName','Helvetica','fontsize',16)
 yticks([0,1])
@@ -1100,10 +1284,10 @@ figure('Name', 'Slope of arm pref, non-pref MD relationship across epochs')
 set(gcf, 'Position',  [200, 200, 350, 600])
 
 subplot(2,1,1)
-errorbar([1:3]-0.05, Y_pmd_ipsi, neg_pmd_ipsi, pos_pmd_ipsi, ...
+errorbar((1:3)-0.05, Y_pmd_ipsi(1:3), neg_pmd_ipsi(1:3), pos_pmd_ipsi(1:3), ...
     'o-', 'LineWidth',1.5)
 hold on
-errorbar([1:3]+0.05, Y_pmd_contra, neg_pmd_contra, pos_pmd_contra, ...
+errorbar((1:3)+0.05, Y_pmd_contra(1:3), neg_pmd_contra(1:3), pos_pmd_contra(1:3), ...
     'o-', 'LineWidth',1.5)
 xlim([0.5, 3.5])
 xticks([1,2,3])
@@ -1121,10 +1305,10 @@ ax = gca;
 ax.Clipping = 'off';
 
 subplot(2,1,2)
-errorbar([1:3]-0.05, Y_m1_ipsi, neg_m1_ipsi, pos_m1_ipsi, ...
+errorbar((1:3)-0.05, Y_m1_ipsi(1:3), neg_m1_ipsi(1:3), pos_m1_ipsi(1:3), ...
     'o-', 'LineWidth',1.5)
 hold on
-errorbar([1:3]+0.05, Y_m1_contra, neg_m1_contra, pos_m1_contra, ...
+errorbar((1:3)+0.05, Y_m1_contra(1:3), neg_m1_contra(1:3), pos_m1_contra(1:3), ...
     'o-', 'LineWidth',1.5)
 xlim([0.5, 3.5])
 xticks([1,2,3])
@@ -1262,10 +1446,10 @@ contra_pos(1,:) = -contra_means(1,:) + ...
 figure('Name', 'Modulation captured in each regime of arm preferences (Rest)')
 set(gcf, 'Position',  [200, 200, 350, 300])
 
-errorbar([1:3]-0.05, ipsi_means(1,:), ipsi_neg(1,:), ipsi_pos(1,:), ...
+errorbar((1:3)-0.05, ipsi_means(1,:), ipsi_neg(1,:), ipsi_pos(1,:), ...
     'o', 'LineWidth',1.5)
 hold on
-errorbar([1:3]+0.05, contra_means(1,:), contra_neg(1,:), contra_pos(1,:), ...
+errorbar((1:3)+0.05, contra_means(1,:), contra_neg(1,:), contra_pos(1,:), ...
     'o', 'LineWidth',1.5)
 xlim([0.5, 3.5])
 xticks([1,2,3])
@@ -1402,10 +1586,10 @@ contra_pos(2,:) = -contra_means(2,:) + ...
 figure('Name', 'Modulation captured in each regime of arm preferences (Instruct)')
 set(gcf, 'Position',  [200, 200, 350, 300])
 
-errorbar([1:3]-0.05, ipsi_means(2,:), ipsi_neg(2,:), ipsi_pos(2,:), ...
+errorbar((1:3)-0.05, ipsi_means(2,:), ipsi_neg(2,:), ipsi_pos(2,:), ...
     'o', 'LineWidth',1.5)
 hold on
-errorbar([1:3]+0.05, contra_means(2,:), contra_neg(2,:), contra_pos(2,:), ...
+errorbar((1:3)+0.05, contra_means(2,:), contra_neg(2,:), contra_pos(2,:), ...
     'o', 'LineWidth',1.5)
 xlim([0.5, 3.5])
 xticks([1,2,3])
@@ -1542,10 +1726,10 @@ contra_pos(3,:) = -contra_means(3,:) + ...
 figure('Name', 'Modulation captured in each regime of arm preferences (Move)')
 set(gcf, 'Position',  [200, 200, 350, 300])
 
-errorbar([1:3]-0.05, ipsi_means(3,:), ipsi_neg(3,:), ipsi_pos(3,:), ...
+errorbar((1:3)-0.05, ipsi_means(3,:), ipsi_neg(3,:), ipsi_pos(3,:), ...
     'o', 'LineWidth',1.5)
 hold on
-errorbar([1:3]+0.05, contra_means(3,:), contra_neg(3,:), contra_pos(3,:), ...
+errorbar((1:3)+0.05, contra_means(3,:), contra_neg(3,:), contra_pos(3,:), ...
     'o', 'LineWidth',1.5)
 xlim([0.5, 3.5])
 xticks([1,2,3])
@@ -1562,26 +1746,167 @@ legend({'Ipsi','Contra'})
 title('Move')
 
 
+%% plot cumulative modulation accounted for, extended phase
+
+% sort by arm preference (using held out data for assignments)
+[sorted_arm_pref, idx] = ...
+    sort([arm_pref_pmd_ic.extend; arm_pref_m1_ic.extend]);
+sorted_modulation = ...
+    [modulation_pmd_ic.extend; modulation_m1_ic.extend];
+sorted_modulation = sorted_modulation(idx,:);
+idx = ~isnan(sorted_arm_pref);
+sorted_arm_pref = sorted_arm_pref(idx);
+sorted_modulation = sorted_modulation(idx,:);
+
+boot_cumsum_ipsi = zeros(10000,length(sorted_arm_pref)+2);
+boot_cumsum_contra = zeros(10000,length(sorted_arm_pref)+2);
+parfor boot = 1:10000
+    
+    X = sorted_arm_pref;
+    Y = sorted_modulation;
+    [X, boot_idx] = datasample(X, length(X), 'Replace',true);
+    Y = Y(boot_idx,:);
+    [X, sort_idx] = sort(X);
+    Y = Y(sort_idx,:);
+    X = [-1;X;1];
+    Y = [cumsum(Y(:,1))/sum(Y(:,1)), cumsum(Y(:,2))/sum(Y(:,2))];
+    Y = [0,0; Y; 1,1];
+    
+    [resampled_Y1, ~] = resample(Y(:,1),X);
+    [resampled_Y2, ~] = resample(Y(:,2),X);
+    
+    boot_cumsum_ipsi(boot,:) = [resampled_Y1];
+    boot_cumsum_contra(boot,:) = [resampled_Y2];
+    
+end
+X = linspace(-1,1,size(boot_cumsum_ipsi,2));
+
+% open figure window
+figure('Name', ...
+    'Ipsi unit level modulation separation (Extend)')
+set(gcf, 'Position',  [2000, 200, 600, 250])
+
+% plot data
+shadedErrorBar(X,boot_cumsum_ipsi,{@mean,@std},'lineprops','b')
+hold on
+shadedErrorBar(X,boot_cumsum_contra,{@mean,@std},'lineprops','r')
+
+% format view
+xlim([-1.05, 1.05])
+xlabel('Arm preference','fontsize',16)
+a = get(gca,'XTickLabel');
+set(gca,'XTickLabel',a,'FontName','Helvetica','fontsize',16)
+ylim([-0.025, 1.025])
+yticks([0,0.25,0.50,0.75,1.00])
+yticklabels({'0','','50','','100'}) 
+ylabel({'Cumulative modulation', 'accounted for'},'fontsize',16)
+box on
+
+
+% open figure window
+figure('Name', ...
+    'Contra unit level modulation separation (Extend)')
+set(gcf, 'Position',  [2000, 200, 600, 250])
+
+% plot data
+shadedErrorBar(-X,1-boot_cumsum_ipsi,{@mean,@std},'lineprops','b')
+hold on
+shadedErrorBar(-X,1-boot_cumsum_contra,{@mean,@std},'lineprops','r')
+
+% format view
+xlim([-1.05, 1.05])
+xticks([-1,0,1])
+xticklabels({'1','','-1'})
+xlabel('Arm preference','fontsize',16)
+a = get(gca,'XTickLabel');
+set(gca,'XTickLabel',a,'FontName','Helvetica','fontsize',16)
+ylim([-0.025, 1.025])
+yticks([0,0.25,0.50,0.75,1.00])
+yticklabels({'0','','50','','100'}) 
+ylabel({'% Modulation', 'accounted for'},'fontsize',16)
+box on
+
+
+%% plot VAF in each of the thirds of the arm preference distribution (Extended)
+
+% find indices for +/-0.3 and +/-0.4 arm pref index
+ipsi_idx = find(X>-0.4,1);
+contra_idx = find(X>0.4,1)-1;
+share_idx = [find(X>-0.3,1), find(X>0.3,1)-1];
+
+% collect data
+ipsi_in_ipsi = sort(boot_cumsum_ipsi(:,ipsi_idx));
+contra_in_ipsi = sort(boot_cumsum_contra(:,ipsi_idx));
+
+contra_in_contra = sort(1-boot_cumsum_contra(:,contra_idx));
+ipsi_in_contra = sort(1-boot_cumsum_ipsi(:,contra_idx));
+
+ipsi_in_shared = ...
+    sort(boot_cumsum_ipsi(:,share_idx(2)) - boot_cumsum_ipsi(:,share_idx(1)));
+contra_in_shared = ...
+    sort(boot_cumsum_contra(:,share_idx(2)) - boot_cumsum_contra(:,share_idx(1)));
+
+ipsi_means(4,:) = ...
+    [mean(ipsi_in_contra), mean(ipsi_in_shared), mean(ipsi_in_ipsi)];
+contra_means(4,:) = ...
+    [mean(contra_in_contra), mean(contra_in_shared), mean(contra_in_ipsi)];
+
+ipsi_neg(4,:) = ipsi_means(4,:) - ...
+    [quantile(ipsi_in_contra, 0.025), quantile(ipsi_in_shared, 0.025), quantile(ipsi_in_ipsi, 0.025)];
+contra_neg(4,:) = contra_means(4,:) - ...
+    [quantile(contra_in_contra, 0.025), quantile(contra_in_shared, 0.025), quantile(contra_in_ipsi, 0.025)];
+
+ipsi_pos(4,:) = -ipsi_means(4,:) + ...
+    [quantile(ipsi_in_contra, 0.975), quantile(ipsi_in_shared, 0.975), quantile(ipsi_in_ipsi, 0.975)];
+contra_pos(4,:) = -contra_means(4,:) + ...
+    [quantile(contra_in_contra, 0.975), quantile(contra_in_shared, 0.975), quantile(contra_in_ipsi, 0.975)];
+
+
+% plot
+figure('Name', 'Modulation captured in each regime of arm preferences (Extend)')
+set(gcf, 'Position',  [200, 200, 350, 300])
+
+errorbar((1:3)-0.05, ipsi_means(4,:), ipsi_neg(4,:), ipsi_pos(4,:), ...
+    'o', 'LineWidth',1.5)
+hold on
+errorbar((1:3)+0.05, contra_means(4,:), contra_neg(4,:), contra_pos(4,:), ...
+    'o', 'LineWidth',1.5)
+xlim([0.5, 3.5])
+xticks([1,2,3])
+xticklabels({'Contra','Neutral','Ipsi'})
+a = get(gca,'XTickLabel');
+set(gca,'XTickLabel',a,'FontName','Helvetica','fontsize',16)
+yticks([0, 0.25, 0.5, 0.75, 1])
+yticklabels({'0','','','','1'})
+ylabel({'% Modulation', 'accounted for'},'fontsize',16)
+ylim([0,1])
+hYLabel = get(gca,'YLabel');
+set(hYLabel,'rotation',0,'VerticalAlignment','middle', 'HorizontalAlignment','right')
+legend({'Ipsi','Contra'})
+title('Extend')
+
+
 %% plot all phases together
-figure('Name', 'Modulation captured in each regime of arm preferences (All phases)')
+figure('Name', ...
+    'Modulation captured in each regime of arm preferences (All phases)')
 set(gcf, 'Position',  [200, 200, 500, 250])
 
-errorbar([1:3]+0.1, ipsi_means(:,1), ipsi_neg(:,1), ipsi_pos(:,1), ...
+errorbar((1:3)+0.1, ipsi_means(1:3,1), ipsi_neg(1:3,1), ipsi_pos(1:3,1), ...
     'bo-', 'LineWidth',1.5)
 hold on
-errorbar([1:3]-0.1, contra_means(:,1), contra_neg(:,1), contra_pos(:,1), ...
+errorbar((1:3)-0.1, contra_means(1:3,1), contra_neg(1:3,1), contra_pos(1:3,1), ...
     'ro-', 'LineWidth',1.5)
 
-errorbar([5:7]+0.1, ipsi_means(:,2), ipsi_neg(:,2), ipsi_pos(:,2), ...
+errorbar((5:7)+0.1, ipsi_means(1:3,2), ipsi_neg(1:3,2), ipsi_pos(1:3,2), ...
     'bo-', 'LineWidth',1.5)
 hold on
-errorbar([5:7]-0.1, contra_means(:,2), contra_neg(:,2), contra_pos(:,2), ...
+errorbar((5:7)-0.1, contra_means(1:3,2), contra_neg(1:3,2), contra_pos(1:3,2), ...
     'ro-', 'LineWidth',1.5)
 
-errorbar([9:11]+0.1, ipsi_means(:,3), ipsi_neg(:,3), ipsi_pos(:,3), ...
+errorbar((9:11)+0.1, ipsi_means(1:3,3), ipsi_neg(1:3,3), ipsi_pos(1:3,3), ...
     'bo-', 'LineWidth',1.5)
 hold on
-errorbar([9:11]-0.1, contra_means(:,3), contra_neg(:,3), contra_pos(:,3), ...
+errorbar((9:11)-0.1, contra_means(1:3,3), contra_neg(1:3,3), contra_pos(1:3,3), ...
     'ro-', 'LineWidth',1.5)
 
 xlim([0, 12])
@@ -1602,35 +1927,35 @@ title('MD dist across phases')
 %% local functions
 
     function slope = compute_bs_slope(X, Y, contra_ipsi, pref_non)
-    % cleans arm pref and modulation data, then computes the slope of their
-    % relationship
-    
-    % select the preferred arm modulation, then take the log of those
-    % modulation values and the absolute value of the arm preferences
-    if strcmp(pref_non, 'pref')
-        pref_idx = sub2ind([length(X),2], (1:length(X))', (X>0)+1);
-    elseif strcmp(pref_non, 'non')
-        pref_idx = sub2ind([length(X),2], (1:length(X))', (X<0)+1);
-    end
-    Y = log10(Y(pref_idx));
-    
-    % select only units that prefer the arm designated by input
-    % (contra_ipsi) and remove units with small modulation, which are not  
-    % meaningful and would dominate the regression if not accounted for.
-    if strcmp(contra_ipsi, 'contra')
-        ic_idx = X>0 & Y>-1;
-    elseif strcmp(contra_ipsi, 'ipsi')
-        ic_idx = X<0 & Y>-1;
-    end    
-    X = abs(X(ic_idx));
-    Y = Y(ic_idx);
-
-    % bootstrap a new data sample and compute the slope
-    [X, sample_idx] = datasample(X, length(X), 'Replace',true);
-    Y = Y(sample_idx);
-    b = polyfit(X,Y,1);
-    slope = b(1);
-
+        % cleans arm pref and modulation data, then computes the slope of their
+        % relationship
+        
+        % select the preferred arm modulation values, then take the log of those
+        % modulation values
+        if strcmp(pref_non, 'pref')
+            pref_idx = sub2ind([length(X),2], (1:length(X))', (X>0)+1);
+        elseif strcmp(pref_non, 'non')
+            pref_idx = sub2ind([length(X),2], (1:length(X))', (X<0)+1);
+        end
+        Y = log10(Y(pref_idx));
+        
+        % select only units that prefer the arm designated by input
+        % (contra_ipsi) and remove units with small modulation, which are not
+        % meaningful and would dominate the regression if not accounted for.
+        if strcmp(contra_ipsi, 'contra')
+            ic_idx = X>0 & Y>-1;
+        elseif strcmp(contra_ipsi, 'ipsi')
+            ic_idx = X<0 & Y>-1;
+        end
+        X = abs(X(ic_idx));
+        Y = Y(ic_idx);
+        
+        % bootstrap a new data sample and compute the slope
+        [X, sample_idx] = datasample(X, length(X), 'Replace',true);
+        Y = Y(sample_idx);
+        b = polyfit(X,Y,1);
+        slope = b(1);
+        
     end
 
 end

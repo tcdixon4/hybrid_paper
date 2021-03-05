@@ -9,6 +9,17 @@ function [p_val] = ap_vs_mod_slope_stats(unit_data)
 % ie each Unit is located in a single Area and has 3 different Phases that
 % it is recorded during, each of which has its own Pref
 %
+% This also contains a permutation test for positive regression slope
+% relating arm preference and modulation in the Reach & Return data. This 
+% p-value is logged as p_val.se.unit_label.extend
+% Unit labels are permuted for the arm preference while modulation is held
+% constant. Note that we are NOT permuting unit labels on the modulation
+% values for each arm and re-computing the arm preference to construct the
+% null slope samples. This means that the slope is impacted by the marginal 
+% distributions of modulation values, which is done intentionally. We are
+% not interested in assessing the relationship independent of the marginal
+% distributions, as that is part of the phenomenon we are studying.
+%
 %
 % INPUTS: 
 %
@@ -29,6 +40,7 @@ function [p_val] = ap_vs_mod_slope_stats(unit_data)
 unit_data = unit_data([unit_data.unit_type]==1);
 num_units = length(unit_data);
 
+% data mat for multi-factorial permutation testing
 % col 1: Unit id
 % col 2: Area -            Pmd=0, M1 = 1
 % col 3: Phase -           Rest=1, Instruct=2, Move=3
@@ -47,35 +59,55 @@ for unit = num_units:-1:1
     data_mat((3*unit-2),5) = abs(unit_data(unit).arm_pref.rest);
     data_mat((3*unit-1),5) = abs(unit_data(unit).arm_pref.prep);
     data_mat(3*unit,5) = abs(unit_data(unit).arm_pref.move);
+    extend_ap(unit) = abs(unit_data(unit).arm_pref.extend);
+    extend_area(unit) = unit_data(unit).area;
     
     if unit_data(unit).hem == 0
         % preferred arm (ipsi/contra)
         data_mat((3*unit-2),4) = unit_data(unit).arm_pref.rest>0;
         data_mat((3*unit-1),4) = unit_data(unit).arm_pref.prep>0;
         data_mat(3*unit,4) = unit_data(unit).arm_pref.move>0;
+        extend_pref(unit) = unit_data(unit).arm_pref.extend>0;
         % modulation of preferred arm
         data_mat((3*unit-2),6) = log10(...
             unit_data(unit).modulation.rest(data_mat((3*unit-2),4)+1));
         data_mat((3*unit-1),6) = log10(...
             unit_data(unit).modulation.prep(data_mat((3*unit-1),4)+1));
         data_mat(3*unit,6) = log10(...
-            unit_data(unit).modulation.move(data_mat(3*unit,4)+1));      
+            unit_data(unit).modulation.move(data_mat(3*unit,4)+1));  
+        extend_mod(unit) = log10(...
+            unit_data(unit).modulation.extend(extend_pref(unit)+1));
         
     elseif unit_data(unit).hem == 1
         % preferred arm (ipsi/contra)
         data_mat((3*unit-2),4) = unit_data(unit).arm_pref.rest<0;
         data_mat((3*unit-1),4) = unit_data(unit).arm_pref.prep<0;
         data_mat(3*unit,4) = unit_data(unit).arm_pref.move<0;
+        extend_pref(unit) = unit_data(unit).arm_pref.extend<0;
         % modulation of preferred arm
         data_mat((3*unit-2),6) = log10(...
             unit_data(unit).modulation.rest(2-data_mat((3*unit-2),4)));
         data_mat((3*unit-1),6) = log10(...
             unit_data(unit).modulation.prep(2-data_mat((3*unit-1),4)));
         data_mat(3*unit,6) = log10(...
-            unit_data(unit).modulation.move(2-data_mat(3*unit,4)));       
+            unit_data(unit).modulation.move(2-data_mat(3*unit,4))); 
+        extend_mod(unit) = log10(...
+            unit_data(unit).modulation.extend(2-extend_pref(unit)));
         
-    end
+    end    
+    
 end
+
+% separate Reach & Return data into PMd/M1 and Ipsi-pref/Contra-pref
+ipsipref_m1_ap = extend_ap((~extend_pref) & (extend_area));
+ipsipref_pmd_ap = extend_ap((~extend_pref) & (~extend_area));
+contrapref_m1_ap = extend_ap((extend_pref) & (extend_area));
+contrapref_pmd_ap = extend_ap((extend_pref) & (~extend_area));
+
+ipsipref_m1_mod = extend_mod((~extend_pref) & (extend_area));
+ipsipref_pmd_mod = extend_mod((~extend_pref) & (~extend_area));
+contrapref_m1_mod = extend_mod((extend_pref) & (extend_area));
+contrapref_pmd_mod = extend_mod((extend_pref) & (~extend_area));
 
 
 %% Permutation procedure
@@ -90,7 +122,7 @@ for perm = 10000:-1:1
     shuff_area = repmat(shuff_area,[3,1]);
     perm_data(:,2) = shuff_area(:);
     % remove negative outliers (log scale can inflate these)
-    rmv = find(perm_data(:,6)<-1);
+    rmv = perm_data(:,6)<-1;
     perm_data(rmv,:) = [];
     % calculate slope of each new grouping
     pmd_idx = find(perm_data(:,2)==0);
@@ -108,7 +140,7 @@ for perm = 10000:-1:1
         perm_data((3*unit-2):unit*3,3) = randperm(3);
     end
     % remove negative outliers (log scale can inflate these)
-    rmv = find(perm_data(:,6)<-1);
+    rmv = perm_data(:,6)<-1;
     perm_data(rmv,:) = [];
     % calculate slope of each new grouping
     rest_idx = find(perm_data(:,3)==1);
@@ -133,7 +165,7 @@ for perm = 10000:-1:1
     perm_data((2*num_units+1):(num_units*3), 4) = ...
         perm_data(randperm(num_units)+2*num_units, 4);
     % remove negative outliers (log scale can inflate these)
-    rmv = find(perm_data(:,6)<-1);
+    rmv = perm_data(:,6)<-1;
     perm_data(rmv,:) = [];
     % calculate slope of each new grouping
     ipsi_idx = find(perm_data(:,4)==0);
@@ -156,7 +188,7 @@ for perm = 10000:-1:1
         perm_data((3*unit-2):unit*3,3) = randperm(3);
     end
     % remove negative outliers (log scale can inflate these)
-    rmv = find(perm_data(:,6)<-1);
+    rmv = perm_data(:,6)<-1;
     perm_data(rmv,:) = [];
     % calculate slope of each new grouping
     pmd_rest_idx = find(perm_data(:,2)==0 & perm_data(:,3)==1);
@@ -191,13 +223,13 @@ for perm = 10000:-1:1
     shuff_area = repmat(shuff_area,[3,1]);
     perm_data(:,2) = shuff_area(:);
     % isolate Instruct and Move, then shuffle Phase labels within units
-    rmv = find(perm_data(:,3)==1);
+    rmv = perm_data(:,3)==1;
     perm_data(rmv,:) = [];
     for unit = num_units:-1:1
         perm_data((2*unit-1):unit*2,3) = randperm(2);
     end
     % remove negative outliers (log scale can inflate these)
-    rmv = find(perm_data(:,6)<-1);
+    rmv = perm_data(:,6)<-1;
     perm_data(rmv,:) = [];
     % calculate slope of each new grouping
     pmd_prep_idx = find(perm_data(:,2)==0 & perm_data(:,3)==2);
@@ -236,7 +268,7 @@ for perm = 10000:-1:1
     perm_data((2*num_units+1):(num_units*3), 4) = ...
         perm_data(randperm(num_units)+2*num_units, 4);
     % remove negative outliers (log scale can inflate these)
-    rmv = find(perm_data(:,6)<-1);
+    rmv = perm_data(:,6)<-1;
     perm_data(rmv,:) = [];
     % calculate slope of each new grouping
     pmd_ipsi_idx = find(perm_data(:,2)==0 & perm_data(:,4)==0);
@@ -279,7 +311,7 @@ for perm = 10000:-1:1
     perm_data((2*num_units+1):(num_units*3), 4) = ...
         perm_data(randperm(num_units)+2*num_units, 4);
     % remove negative outliers (log scale can inflate these)
-    rmv = find(perm_data(:,6)<-1);
+    rmv = perm_data(:,6)<-1;
     perm_data(rmv,:) = [];
     % calculate slope of each new grouping
     rest_ipsi_idx = find(perm_data(:,3)==1 & perm_data(:,4)==0);
@@ -314,9 +346,9 @@ for perm = 10000:-1:1
     contra_data = data_mat(data_mat(:,4)==1,:);
     contra_data(:,3) = contra_data(randperm(size(contra_data,1)),3);
     % remove negative outliers (log scale can inflate these)
-    rmv = find(ipsi_data(:,6)<-1);
+    rmv = ipsi_data(:,6)<-1;
     ipsi_data(rmv,:) = [];
-    rmv = find(contra_data(:,6)<-1);
+    rmv = contra_data(:,6)<-1;
     contra_data(rmv,:) = [];
     % calculate slope of each new grouping for Ipsi
     rest_idx = find(ipsi_data(:,3)==1);
@@ -345,9 +377,9 @@ for perm = 10000:-1:1
     move_data = data_mat(data_mat(:,3)==3,:);
     move_data(:,2) = move_data(randperm(size(move_data,1)),2);
     % remove negative outliers (log scale can inflate these)
-    rmv = find(prep_data(:,6)<-1);
+    rmv = prep_data(:,6)<-1;
     prep_data(rmv,:) = [];
-    rmv = find(move_data(:,6)<-1);
+    rmv = move_data(:,6)<-1;
     move_data(rmv,:) = [];
     % calculate slope of each new grouping for Instruct
     pmd_idx = find(prep_data(:,2)==0);
@@ -372,9 +404,9 @@ for perm = 10000:-1:1
     move_data = data_mat(data_mat(:,3)==3,:);
     move_data(:,4) = move_data(randperm(size(move_data,1)),4);
     % remove negative outliers (log scale can inflate these)
-    rmv = find(prep_data(:,6)<-1);
+    rmv = prep_data(:,6)<-1;
     prep_data(rmv,:) = [];
-    rmv = find(move_data(:,6)<-1);
+    rmv = move_data(:,6)<-1;
     move_data(rmv,:) = [];
     % calculate slope of each new grouping for Instruct
     ipsi_idx = find(prep_data(:,4)==0);
@@ -392,12 +424,33 @@ for perm = 10000:-1:1
     se_pref_move_null(perm,1) = abs(b_contra(1) - b_ipsi(1));
     
     
+    %% permutation test for positive slope in Reach & Return data
+    % shuffle unit labels across units for arm preference values
+    shuff_ipsipref_m1_ap = ipsipref_m1_ap(randperm(length(ipsipref_m1_ap)));
+    shuff_ipsipref_pmd_ap = ipsipref_pmd_ap(randperm(length(ipsipref_pmd_ap)));
+    shuff_contrapref_m1_ap = contrapref_m1_ap(randperm(length(contrapref_m1_ap)));
+    shuff_contrapref_pmd_ap = contrapref_pmd_ap(randperm(length(contrapref_pmd_ap)));
+    % calculate slope of the shuffled dataset and log in null distribution
+    b_ipsi_m1 = polyfit(shuff_ipsipref_m1_ap(ipsipref_m1_mod>=-1),...
+        ipsipref_m1_mod(ipsipref_m1_mod>=-1), 1);
+    b_ipsi_pmd = polyfit(shuff_ipsipref_pmd_ap(ipsipref_pmd_mod>=-1),...
+        ipsipref_pmd_mod(ipsipref_pmd_mod>=-1), 1);
+    b_contra_m1 = polyfit(shuff_contrapref_m1_ap(contrapref_m1_mod>=-1),...
+        contrapref_m1_mod(contrapref_m1_mod>=-1), 1);
+    b_contra_pmd = polyfit(shuff_contrapref_pmd_ap(contrapref_pmd_mod>=-1),...
+        contrapref_pmd_mod(contrapref_pmd_mod>=-1), 1);
+    extend_b_ipsi_m1_null(perm,1) = b_ipsi_m1(1);
+    extend_b_ipsi_pmd_null(perm,1) = b_ipsi_pmd(1);
+    extend_b_contra_m1_null(perm,1) = b_contra_m1(1);
+    extend_b_contra_pmd_null(perm,1) = b_contra_pmd(1);
+    
+    
 end
 
 
 %% Main effect: Area p-value
 % remove negative outliers (log scale can inflate these)
-rmv = find(data_mat(:,6)<-1);
+rmv = data_mat(:,6)<-1;
 data_mat(rmv,:) = [];
 % calculate slope of each observed grouping
 pmd_idx = find(data_mat(:,2)==0);
@@ -535,9 +588,9 @@ p_val.ie.phase_pref = mean(ie_phase_pref_null>ie_phase_pref_obs);
 ipsi_data = data_mat(data_mat(:,4)==0,:);
 contra_data = data_mat(data_mat(:,4)==1,:);
 % remove negative outliers (log scale can inflate these)
-rmv = find(ipsi_data(:,6)<-1);
+rmv = ipsi_data(:,6)<-1;
 ipsi_data(rmv,:) = [];
-rmv = find(contra_data(:,6)<-1);
+rmv = contra_data(:,6)<-1;
 contra_data(rmv,:) = [];
 % calculate slope of each observed grouping for Ipsi
 rest_idx = find(ipsi_data(:,3)==1);
@@ -566,9 +619,9 @@ p_val.se.phase.contra = mean(se_phase_contra_null>se_phase_contra_obs);
 prep_data = data_mat(data_mat(:,3)==2,:);
 move_data = data_mat(data_mat(:,3)==3,:);
 % remove negative outliers (log scale can inflate these)
-rmv = find(prep_data(:,6)<-1);
+rmv = prep_data(:,6)<-1;
 prep_data(rmv,:) = [];
-rmv = find(move_data(:,6)<-1);
+rmv = move_data(:,6)<-1;
 move_data(rmv,:) = [];
 % calculate slope of each observed grouping for Instruct
 pmd_idx = find(prep_data(:,2)==0);
@@ -593,9 +646,9 @@ p_val.se.area.move = mean(se_area_move_null>se_area_move_obs);
 prep_data = data_mat(data_mat(:,3)==2,:);
 move_data = data_mat(data_mat(:,3)==3,:);
 % remove negative outliers (log scale can inflate these)
-rmv = find(prep_data(:,6)<-1);
+rmv = prep_data(:,6)<-1;
 prep_data(rmv,:) = [];
-rmv = find(move_data(:,6)<-1);
+rmv = move_data(:,6)<-1;
 move_data(rmv,:) = [];
 % calculate slope of each observed grouping for Instruct
 ipsi_idx = find(prep_data(:,4)==0);
@@ -613,6 +666,31 @@ b_contra = polyfit(move_data(contra_idx,5),move_data(contra_idx,6),1);
 % compute contrast for Move
 se_pref_move_obs = abs(b_contra(1) - b_ipsi(1));
 p_val.se.pref.move = mean(se_pref_move_null>se_pref_move_obs);
+
+
+%% permutation test for positive slope in Reach & Return data
+b_ipsi_m1 = polyfit(ipsipref_m1_ap(ipsipref_m1_mod>=-1),...
+    ipsipref_m1_mod(ipsipref_m1_mod>=-1), 1);
+b_ipsi_pmd = polyfit(ipsipref_pmd_ap(ipsipref_pmd_mod>=-1),...
+    ipsipref_pmd_mod(ipsipref_pmd_mod>=-1), 1);
+b_contra_m1 = polyfit(contrapref_m1_ap(contrapref_m1_mod>=-1),...
+    contrapref_m1_mod(contrapref_m1_mod>=-1), 1);
+b_contra_pmd = polyfit(contrapref_pmd_ap(contrapref_pmd_mod>=-1),...
+    contrapref_pmd_mod(contrapref_pmd_mod>=-1), 1);
+extend_b_ipsi_m1_obs = b_ipsi_m1(1);
+extend_b_ipsi_pmd_obs = b_ipsi_pmd(1);
+extend_b_contra_m1_obs = b_contra_m1(1);
+extend_b_contra_pmd_obs = b_contra_pmd(1);
+% log p-value as proportion of null distribution with slope at least as
+% extreme as the observed value (one-sided)
+p_val.se.unit_label.ipsi_pref.m1 = ...
+    mean(abs(extend_b_ipsi_m1_null)>extend_b_ipsi_m1_obs);
+p_val.se.unit_label.ipsi_pref.pmd = ...
+    mean(abs(extend_b_ipsi_pmd_null)>extend_b_ipsi_pmd_obs);
+p_val.se.unit_label.contra_pref.m1 = ...
+    mean(abs(extend_b_contra_m1_null)>extend_b_contra_m1_obs);
+p_val.se.unit_label.contra_pref.pmd = ...
+    mean(abs(extend_b_contra_pmd_null)>extend_b_contra_pmd_obs);
     
 
 

@@ -1,4 +1,5 @@
-function [X_ecc, X_cen] = prep_pca_pref_epochs(unit_data, norm_method)
+function [X_ecc, X_cen, unit_area] = ...
+    prep_pca_pref_epochs(unit_data, norm_method)
 
 %
 % Collects firing rate data from two independent datasets into 
@@ -34,14 +35,23 @@ function [X_ecc, X_cen] = prep_pca_pref_epochs(unit_data, norm_method)
 % 
 
 
-%% Compute arm preferences
+%% Setup
 
+%Compute arm preferences
 [arm_pref, ~, ~, ~]...
     = calc_limb_dedication(unit_data, 0);
-
 r_pref_idx.rest = arm_pref.rest>0;
 r_pref_idx.prep = arm_pref.prep>0;
 r_pref_idx.move = arm_pref.move>0;
+
+% log the unit area (PMd/M1) for each grouping. The struct organization
+% looks redundant, but it is set up this way for the scripts it is used in
+unit_area.l_pref.rest.unit_area = [unit_data(~r_pref_idx.rest).area];
+unit_area.l_pref.prep.unit_area = [unit_data(~r_pref_idx.prep).area];
+unit_area.l_pref.move.unit_area = [unit_data(~r_pref_idx.move).area];
+unit_area.r_pref.rest.unit_area = [unit_data(r_pref_idx.rest).area];
+unit_area.r_pref.prep.unit_area = [unit_data(r_pref_idx.prep).area];
+unit_area.r_pref.move.unit_area = [unit_data(r_pref_idx.move).area];
 
 
 %% Set up data matrices for center config

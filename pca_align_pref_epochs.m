@@ -1,4 +1,5 @@
-function [princ_var] = pca_align_pref_epochs(unit_data, p, norm_method)
+function [princ_var, coeffs] = ...
+    pca_align_pref_epochs(unit_data, p, norm_method)
 
 %
 % Computes PCA models using trials of the "non-preferred" arm and projects
@@ -34,7 +35,8 @@ function [princ_var] = pca_align_pref_epochs(unit_data, p, norm_method)
 
 %% Setup
 
-[X_ecc, X_cen] = prep_pca_pref_epochs(unit_data, norm_method);
+[X_ecc, X_cen, unit_area] = prep_pca_pref_epochs(unit_data, norm_method);
+coeffs = unit_area;
 
 
 %% train pca models on center config data using only non-preferred arm
@@ -47,6 +49,7 @@ X_test_l_hand = X_ecc.l_pref.l_hand.rest;
 X_test_r_hand = X_ecc.l_pref.r_hand.rest;
 [P,~,~,~,~,~] = ...
     pca(X_train,'NumComponents',p, 'Centered',false);
+coeffs.l_pref.rest.weights = P;
 T_l_hand = X_test_l_hand*P;
 T_r_hand = X_test_r_hand*P;
 princ_var.l_pref.l_hand.rest = trace(cov(T_l_hand));
@@ -58,6 +61,7 @@ X_test_l_hand = X_ecc.l_pref.l_hand.prep;
 X_test_r_hand = X_ecc.l_pref.r_hand.prep;
 [P,~,~,~,~,~] = ...
     pca(X_train,'NumComponents',p, 'Centered',false);
+coeffs.l_pref.prep.weights = P;
 T_l_hand = X_test_l_hand*P;
 T_r_hand = X_test_r_hand*P;
 princ_var.l_pref.l_hand.prep = trace(cov(T_l_hand));
@@ -69,6 +73,7 @@ X_test_l_hand = X_ecc.l_pref.l_hand.move;
 X_test_r_hand = X_ecc.l_pref.r_hand.move;
 [P,~,~,~,~,~] = ...
     pca(X_train,'NumComponents',p, 'Centered',false);
+coeffs.l_pref.move.weights = P;
 T_l_hand = X_test_l_hand*P;
 T_r_hand = X_test_r_hand*P;
 princ_var.l_pref.l_hand.move = trace(cov(T_l_hand));
@@ -81,6 +86,7 @@ X_test_l_hand = X_ecc.r_pref.l_hand.rest;
 X_test_r_hand = X_ecc.r_pref.r_hand.rest;
 [P,~,~,~,~,~] = ...
     pca(X_train,'NumComponents',p, 'Centered',false);
+coeffs.r_pref.rest.weights = P;
 T_l_hand = X_test_l_hand*P;
 T_r_hand = X_test_r_hand*P;
 princ_var.r_pref.l_hand.rest = trace(cov(T_l_hand));
@@ -92,6 +98,7 @@ X_test_l_hand = X_ecc.r_pref.l_hand.prep;
 X_test_r_hand = X_ecc.r_pref.r_hand.prep;
 [P,~,~,~,~,~] = ...
     pca(X_train,'NumComponents',p, 'Centered',false);
+coeffs.r_pref.prep.weights = P;
 T_l_hand = X_test_l_hand*P;
 T_r_hand = X_test_r_hand*P;
 princ_var.r_pref.l_hand.prep = trace(cov(T_l_hand));
@@ -103,6 +110,7 @@ X_test_l_hand = X_ecc.r_pref.l_hand.move;
 X_test_r_hand = X_ecc.r_pref.r_hand.move;
 [P,~,~,~,~,~] = ...
     pca(X_train,'NumComponents',p, 'Centered',false);
+coeffs.r_pref.move.weights = P;
 T_l_hand = X_test_l_hand*P;
 T_r_hand = X_test_r_hand*P;
 princ_var.r_pref.l_hand.move = trace(cov(T_l_hand));
