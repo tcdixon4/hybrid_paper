@@ -29,6 +29,8 @@ function [X, Y] = prep_lda(unit_data)
 
 %% Compute arm preferences
 
+% isolate only non-repeated units
+unit_data = unit_data([unit_data.repeat]==false);
 num_units = length(unit_data);
 % find division between hemispheres
 left_hem_idx = [unit_data.hem]==0;

@@ -12,6 +12,8 @@ function [arm_pref, modulation, mu_rest, sigma_rest, p]...
 %             unit-separated data struct containing hemisphere, brain area,
 %             firing rate and other metrics
 %
+% config - boolean: 0 for center config, 1 for eccentric config
+%
 % OUTPUTS:
 %
 % arm_pref - struct: 1x1, fields 'rest', 'prep', 'move'

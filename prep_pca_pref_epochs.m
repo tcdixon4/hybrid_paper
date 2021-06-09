@@ -38,6 +38,8 @@ function [X_ecc, X_cen, unit_area] = ...
 %% Setup
 
 %Compute arm preferences
+% isolate only non-repeated units
+unit_data = unit_data([unit_data.repeat]==false);
 [arm_pref, ~, ~, ~]...
     = calc_limb_dedication(unit_data, 0);
 r_pref_idx.rest = arm_pref.rest>0;

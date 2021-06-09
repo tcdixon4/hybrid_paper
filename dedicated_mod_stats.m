@@ -22,8 +22,8 @@ function [p_val] = dedicated_mod_stats(unit_data)
 
 %% Prepare arm preference and mod data structures
 
-% isolate only single units
-unit_data = unit_data([unit_data.unit_type]==1);
+% isolate only single units and non-repeated units
+unit_data = unit_data(([unit_data.unit_type]==1) & ([unit_data.repeat]==false));
 num_units = length(unit_data);
 
 % col 1: Unit id

@@ -28,8 +28,8 @@ function [] = plot_arm_pref(unit_data)
 
 %% Prepare arm preference and modulation data structures
 
-% isolate only single units
-unit_data = unit_data([unit_data.unit_type]==1);
+% isolate only single units and non-repeated units
+unit_data = unit_data(([unit_data.unit_type]==1) & ([unit_data.repeat]==false));
 
 m1 = unit_data([unit_data.area]==1);
 pmd = unit_data([unit_data.area]==0);

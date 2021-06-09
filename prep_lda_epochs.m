@@ -30,6 +30,8 @@ function [X, Y] = prep_lda_epochs(unit_data)
 
 %% Compute arm preferences
 
+% isolate only non-repeated units
+unit_data = unit_data([unit_data.repeat]==false);
 [arm_pref, ~, ~, ~]...
     = calc_limb_dedication(unit_data, 0);
 

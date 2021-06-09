@@ -32,6 +32,8 @@ function [X] = prep_pca(unit_data, configs, hem, norm_method)
 %% Set up data matrices
 
 % preallocate matrices for fine-timescale PCA
+% isolate only non-repeated units
+unit_data = unit_data([unit_data.repeat]==false);
 num_units = length(unit_data);
 
 num_trials_l_hand = 0;
