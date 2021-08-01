@@ -12,9 +12,9 @@ function [p] = ap_vs_depth(unit_data)
 %
 % OUTPUTS:
 %
-% stats -
+% p - significance testing results
 %
-% fig -
+% figures
 %
 %
 
