@@ -143,7 +143,8 @@ ax = gca;
 ax.Clipping = 'off';
 legend
 % Fix colors outside matlab to show which arm model each component belongs
-% to (right:red or left:blue)
+% to (right:purple or left:yellow) but leave this way for now in case there
+% is a desire to see which number component each datapoint belongs to
 
 
 

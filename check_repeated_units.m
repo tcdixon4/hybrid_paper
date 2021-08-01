@@ -1,8 +1,8 @@
-function [unit_data, fig] = check_repeated_units(unit_data)
+function [unit_data, fig] = check_repeated_units(unit_data, threshold)
 
 %
-% Calculates metrics for each unit, including arm preference, modulation,
-% etc
+% Adds a boolean flag if a unit is likely to be a repeat of a unit recorded
+% on multiple channels
 %
 %
 % INPUTS: 
@@ -10,6 +10,10 @@ function [unit_data, fig] = check_repeated_units(unit_data)
 % unit_data - struct: 1 x num_units
 %             unit-separated data struct containing hemisphere, brain area,
 %             firing rate and other metrics
+%
+% threshold - numerical scalar in the range [0,1]
+%             determines what firing rate correlation is considered to be
+%             the same unit
 %
 % OUTPUTS:
 %
@@ -52,9 +56,18 @@ for session = 1:num_sessions
     corr_mat{session} = triu(corrcoef(fr_mat), 1);
     % log boolean flags of repeated units, as determined by a threshold 
     % value of correlation with any other unit
-    [row, ~] = find(corr_mat{session} > 0.9);
+    [row, col] = find(corr_mat{session} > threshold);
     rep_unit_session = false(length(session_data),1);
     rep_unit_session(row,1) = true;
+    % if a unit has been flagged as a repeat, check if it was recorded
+    % within 2 channels of the unit that it is supposedly repeating. if it
+    % is not within 2 channels, then remove the repeat flag
+    for k = 1:length(row)
+        if session_data(col(k)).depth - session_data(row(k)).depth > 2
+            rep_unit_session(row,1) = false;
+            disp(row)
+        end
+    end
     rep_unit_full = [rep_unit_full; rep_unit_session];
 end
 % log the repeated unit flag in the unit_data struct
@@ -82,7 +95,7 @@ ylabel('Proportion of pairwise correlations')
 subplot(1,2,2)
 histogram(corr_vals, 0.25:0.05:1, 'normalization','Probability')
 hold on
-xline(0.9, 'r')
+xline(threshold, 'r')
 xlim([0.25,1])
 xlabel('r')
 ylabel('Proportion of pairwise correlations')

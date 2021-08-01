@@ -45,13 +45,13 @@ shadedErrorBar(600:20:1300, mu_nonpref(43:78), sem_nonpref(43:78), ...
     'lineprops','r')
 
 hold on
-plot([0,0],[0,50],'k') % Instruct
-plot([800,800],[0,50],'k') % Move
+xline(0,'k') % Instruct
+xline(800,'k') % Move
 xlim([-300,1300])
 xticks([-300,0,500,600,800,1300])
 xticklabels({'-300ms','Instruct','+500ms','','Move','+500ms'})
 ylim([0,8])
-yticks(linspace(0,8,4))
+yticks(linspace(0,8,5))
 ylabel({'Modulation', '(a.u.)'})
 ax = gca;
 ax.Clipping = 'off';

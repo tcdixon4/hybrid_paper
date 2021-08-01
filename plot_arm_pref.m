@@ -30,6 +30,7 @@ function [] = plot_arm_pref(unit_data)
 
 % isolate only single units and non-repeated units
 unit_data = unit_data(([unit_data.unit_type]==1) & ([unit_data.repeat]==false));
+% unit_data = unit_data([unit_data.unit_type]==1);
 
 m1 = unit_data([unit_data.area]==1);
 pmd = unit_data([unit_data.area]==0);
@@ -207,7 +208,7 @@ legend({'Contra Move','Ipsi Move','Contra Instruct','Ipsi Instruct',...
     'Contra Rest','Ipsi Rest'})
 
 
-%% plot 2x3 subplot of arm pref histograms, separating PMd/M1 and Epochs
+%% plot 2x3 subplot of arm pref histograms, separating PMd/M1 and phases
 
 figure('Name', ...
     'Arm preference distributions across brain area and task epoch')
@@ -215,10 +216,12 @@ set(gcf, 'Position',  [2000, 200, 1000, 600])
 
 % PMd Rest
 subplot(2,3,1)
-histogram(arm_pref_pmd_ic.rest, -1:0.1:1, 'Normalization', 'probability')
+histogram(arm_pref_pmd_ic.rest, -1:0.1:1,...
+          'Normalization', 'probability', 'FaceColor','b', 'EdgeColor','none')
 hold on
-plot([0,0],[0,0.25],'Color',[0.5,0.5,0.5])
-plot(nanmean(arm_pref_pmd_ic.rest), 0,  'r.', 'MarkerSize',20)
+xline(0,'Color',[0.5,0.5,0.5])
+xline(nanmean(arm_pref_pmd_ic.rest), 'k')
+xline(quantile(arm_pref_pmd_ic.rest,0.75),  'k', 'LineWidth', 5)
 xticks([-1,0,1])
 yticks([0,0.25])
 xlim([-1.1,1.1])
@@ -232,10 +235,12 @@ set(hYLabel,'rotation',0,'VerticalAlignment','middle')
 
 % PMd Prep
 subplot(2,3,2)
-histogram(arm_pref_pmd_ic.prep, -1:0.1:1, 'Normalization', 'probability')
+histogram(arm_pref_pmd_ic.prep, -1:0.1:1,...
+          'Normalization', 'probability', 'FaceColor','r', 'EdgeColor','none')
 hold on
-plot([0,0],[0,0.25],'Color',[0.5,0.5,0.5])
-plot(nanmean(arm_pref_pmd_ic.prep), 0,  'r.', 'MarkerSize',20)
+xline(0,'Color',[0.5,0.5,0.5])
+xline(nanmean(arm_pref_pmd_ic.prep), 'k')
+xline(quantile(arm_pref_pmd_ic.prep,0.75),  'k', 'LineWidth', 5)
 xticks([-1,0,1])
 yticks([0,0.25])
 xlim([-1.1,1.1])
@@ -247,10 +252,12 @@ title('Prep','fontsize',24)
 
 % PMd Move
 subplot(2,3,3)
-histogram(arm_pref_pmd_ic.move, -1:0.1:1, 'Normalization', 'probability')
+histogram(arm_pref_pmd_ic.move, -1:0.1:1,...
+          'Normalization', 'probability', 'FaceColor','g', 'EdgeColor','none')
 hold on
-plot([0,0],[0,0.25],'Color',[0.5,0.5,0.5])
-plot(nanmean(arm_pref_pmd_ic.move), 0,  'r.', 'MarkerSize',20)
+xline(0,'Color',[0.5,0.5,0.5])
+xline(nanmean(arm_pref_pmd_ic.move), 'k')
+xline(quantile(arm_pref_pmd_ic.move,0.75),  'k', 'LineWidth', 5)
 xticks([-1,0,1])
 yticks([0,0.25])
 xlim([-1.1,1.1])
@@ -261,10 +268,12 @@ title('Move','fontsize',24)
 
 % M1 Rest
 subplot(2,3,4)
-histogram(arm_pref_m1_ic.rest, -1:0.1:1, 'Normalization', 'probability')
+histogram(arm_pref_m1_ic.rest, -1:0.1:1,...
+          'Normalization', 'probability', 'FaceColor','b', 'EdgeColor','none')
 hold on
-plot([0,0],[0,0.25],'Color',[0.5,0.5,0.5])
-plot(nanmean(arm_pref_m1_ic.rest), 0,  'r.', 'MarkerSize',20)
+xline(0,'Color',[0.5,0.5,0.5])
+xline(nanmean(arm_pref_m1_ic.rest), 'k')
+xline(quantile(arm_pref_m1_ic.rest,0.75),  'k', 'LineWidth', 5)
 xticks([-1,0,1])
 yticks([0,0.25])
 xlim([-1.1,1.1])
@@ -278,10 +287,12 @@ xlabel('Arm Preference','fontsize',16)
 
 % M1 Prep
 subplot(2,3,5)
-histogram(arm_pref_m1_ic.prep, -1:0.1:1, 'Normalization', 'probability')
+histogram(arm_pref_m1_ic.prep, -1:0.1:1,...
+          'Normalization', 'probability', 'FaceColor','r', 'EdgeColor','none')
 hold on
-plot([0,0],[0,0.25],'Color',[0.5,0.5,0.5])
-plot(nanmean(arm_pref_m1_ic.prep), 0,  'r.', 'MarkerSize',20)
+xline(0,'Color',[0.5,0.5,0.5])
+xline(nanmean(arm_pref_m1_ic.rest), 'k')
+xline(quantile(arm_pref_m1_ic.rest,0.75),  'k', 'LineWidth', 5)
 xticks([-1,0,1])
 yticks([0,0.25])
 xlim([-1.1,1.1])
@@ -291,10 +302,154 @@ set(gca,'XTickLabel',a,'FontName','Helvetica','fontsize',14)
 
 % M1 Move
 subplot(2,3,6)
-histogram(arm_pref_m1_ic.move, -1:0.1:1, 'Normalization', 'probability')
+histogram(arm_pref_m1_ic.move, -1:0.1:1,...
+          'Normalization', 'probability', 'FaceColor','g', 'EdgeColor','none')
 hold on
-plot([0,0],[0,0.25],'Color',[0.5,0.5,0.5])
-plot(nanmean(arm_pref_m1_ic.move), 0,  'r.', 'MarkerSize',20)
+xline(0,'Color',[0.5,0.5,0.5])
+xline(nanmean(arm_pref_m1_ic.move), 'k')
+xline(quantile(arm_pref_m1_ic.move,0.75),  'k', 'LineWidth', 5)
+xticks([-1,0,1])
+yticks([0,0.25])
+xlim([-1.1,1.1])
+ylim([0,0.25])
+a = get(gca,'XTickLabel');
+set(gca,'XTickLabel',a,'FontName','Helvetica','fontsize',14)
+
+
+%% plot 2x1 subplot of arm pref histograms, phases overlapping
+
+figure('Name', ...
+    'Arm preference distributions across brain area and task epoch')
+set(gcf, 'Position',  [2000, 200, 1000, 600])
+
+% PMd Rest
+subplot(2,1,1)
+histogram(arm_pref_pmd_ic.rest, -1:0.1:1,...
+          'Normalization', 'probability','FaceColor','b')
+hold on
+xline(0,'Color',[0.5,0.5,0.5])
+plot(nanmean(arm_pref_pmd_ic.rest), 0,  'b.', 'MarkerSize',20)
+xticks([-1,0,1])
+yticks([0,0.25])
+xlim([-1.1,1.1])
+ylim([0,0.25])
+a = get(gca,'XTickLabel');
+set(gca,'XTickLabel',a,'FontName','Helvetica','fontsize',14)
+ylabel('PMd','fontweight','bold','fontsize',24)
+title('Rest','fontsize',24)
+hYLabel = get(gca,'YLabel');
+set(hYLabel,'rotation',0,'VerticalAlignment','middle')
+
+% PMd Prep
+histogram(arm_pref_pmd_ic.prep, -1:0.1:1,...
+          'Normalization', 'probability','FaceColor','r')
+plot(nanmean(arm_pref_pmd_ic.prep), 0,  'r.', 'MarkerSize',20)
+
+% PMd Move
+histogram(arm_pref_pmd_ic.move, -1:0.1:1,...
+          'Normalization', 'probability','FaceColor','g')
+xline(0,'Color',[0.5,0.5,0.5])
+plot(nanmean(arm_pref_pmd_ic.move), 0,  'g.', 'MarkerSize',20)
+
+% M1 Rest
+subplot(2,1,2)
+p{1} = histogram(arm_pref_m1_ic.rest, -1:0.1:1,...
+                 'Normalization', 'probability','FaceColor','b');
+hold on
+xline(0,'Color',[0.5,0.5,0.5])
+plot(nanmean(arm_pref_m1_ic.rest), 0,  'b.', 'MarkerSize',20)
+xticks([-1,0,1])
+yticks([0,0.25])
+xlim([-1.1,1.1])
+ylim([0,0.25])
+a = get(gca,'XTickLabel');
+set(gca,'XTickLabel',a,'FontName','Helvetica','fontsize',14)
+ylabel('M1','fontweight','bold','fontsize',24)
+hYLabel = get(gca,'YLabel');
+set(hYLabel,'rotation',0,'VerticalAlignment','middle')
+xlabel('Arm Preference','fontsize',16)
+
+% M1 Prep
+p{2} = histogram(arm_pref_m1_ic.prep, -1:0.1:1,...
+                 'Normalization', 'probability','FaceColor','r');
+plot(nanmean(arm_pref_m1_ic.prep), 0,  'r.', 'MarkerSize',20)
+
+% M1 Move
+p{3} = histogram(arm_pref_m1_ic.move, -1:0.1:1,...
+                 'Normalization', 'probability','FaceColor','g');
+plot(nanmean(arm_pref_m1_ic.move), 0,  'g.', 'MarkerSize',20)
+
+% legend([p], {'Rest','Instruct','Move'})
+
+
+%% plot 2x2 subplot histograms of CHANGE in arm preference from previous phase
+
+figure('Name', ...
+    'Arm preference changes across epochs')
+set(gcf, 'Position',  [2000, 200, 1000, 600])
+
+% PMd Prep-Rest
+subplot(2,2,1)
+histogram(arm_pref_pmd_ic.prep - arm_pref_pmd_ic.rest, [-2.1, -0.9:0.1:0.9, 2.1],...
+          'Normalization', 'probability', 'FaceColor','b', 'EdgeColor','none')
+hold on
+xline(0,'Color',[0.5,0.5,0.5])
+xline(nanmean(arm_pref_pmd_ic.prep - arm_pref_pmd_ic.rest), 'k')
+xline(quantile(arm_pref_pmd_ic.prep - arm_pref_pmd_ic.rest,0.75),  'k', 'LineWidth', 5)
+xticks([-1,0,1])
+yticks([0,0.25])
+xlim([-1.1,1.1])
+ylim([0,0.25])
+a = get(gca,'XTickLabel');
+set(gca,'XTickLabel',a,'FontName','Helvetica','fontsize',14)
+ylabel('PMd','fontweight','bold','fontsize',24)
+title('Prep-Rest','fontsize',24)
+hYLabel = get(gca,'YLabel');
+set(hYLabel,'rotation',0,'VerticalAlignment','middle')
+
+% PMd Move-Prep
+subplot(2,2,2)
+histogram(arm_pref_pmd_ic.move - arm_pref_pmd_ic.prep, [-2.1, -0.9:0.1:0.9, 2.1],...
+          'Normalization', 'probability', 'FaceColor','r', 'EdgeColor','none')
+hold on
+xline(0,'Color',[0.5,0.5,0.5])
+xline(nanmean(arm_pref_pmd_ic.move - arm_pref_pmd_ic.prep), 'k')
+xline(quantile(arm_pref_pmd_ic.move - arm_pref_pmd_ic.prep,0.75),  'k', 'LineWidth', 5)
+xticks([-1,0,1])
+yticks([0,0.25])
+xlim([-1.1,1.1])
+ylim([0,0.25])
+a = get(gca,'XTickLabel');
+set(gca,'XTickLabel',a,'FontName','Helvetica','fontsize',14)
+title('Move-Prep','fontsize',24)
+
+% M1 Prep-Rest
+subplot(2,2,3)
+histogram(arm_pref_m1_ic.prep - arm_pref_m1_ic.rest, [-2.1, -0.9:0.1:0.9, 2.1],...
+          'Normalization', 'probability', 'FaceColor','b', 'EdgeColor','none')
+hold on
+xline(0,'Color',[0.5,0.5,0.5])
+xline(nanmean(arm_pref_m1_ic.prep - arm_pref_m1_ic.rest), 'k')
+xline(quantile(arm_pref_m1_ic.prep - arm_pref_m1_ic.rest,0.75),  'k', 'LineWidth', 5)
+xticks([-1,0,1])
+yticks([0,0.25])
+xlim([-1.1,1.1])
+ylim([0,0.25])
+a = get(gca,'XTickLabel');
+set(gca,'XTickLabel',a,'FontName','Helvetica','fontsize',14)
+ylabel('M1','fontweight','bold','fontsize',24)
+hYLabel = get(gca,'YLabel');
+set(hYLabel,'rotation',0,'VerticalAlignment','middle')
+xlabel('Arm Preference','fontsize',16)
+
+% M1 Move-Prep
+subplot(2,2,4)
+histogram(arm_pref_m1_ic.move - arm_pref_m1_ic.prep, [-2.1, -0.9:0.1:0.9, 2.1],...
+          'Normalization', 'probability', 'FaceColor','r', 'EdgeColor','none')
+hold on
+xline(0,'Color',[0.5,0.5,0.5])
+xline(nanmean(arm_pref_m1_ic.move - arm_pref_m1_ic.prep), 'k')
+xline(quantile(arm_pref_m1_ic.move - arm_pref_m1_ic.prep,0.75),  'k', 'LineWidth', 5)
 xticks([-1,0,1])
 yticks([0,0.25])
 xlim([-1.1,1.1])
@@ -1923,42 +2078,44 @@ set(hYLabel,'rotation',0,'VerticalAlignment','middle', 'HorizontalAlignment','ri
 legend({'Ipsi','Contra'})
 title('MD dist across phases')
 
+end
 
-%% local functions
 
-    function slope = compute_bs_slope(X, Y, contra_ipsi, pref_non)
-        % cleans arm pref and modulation data, then computes the slope of their
-        % relationship
-        
-        % select the preferred arm modulation values, then take the log of those
-        % modulation values
-        if strcmp(pref_non, 'pref')
-            pref_idx = sub2ind([length(X),2], (1:length(X))', (X>0)+1);
-        elseif strcmp(pref_non, 'non')
-            pref_idx = sub2ind([length(X),2], (1:length(X))', (X<0)+1);
-        end
-        Y = log10(Y(pref_idx));
-        
-        % select only units that prefer the arm designated by input
-        % (contra_ipsi) and remove units with small modulation, which are not
-        % meaningful and would dominate the regression if not accounted for.
-        if strcmp(contra_ipsi, 'contra')
-            ic_idx = X>0 & Y>-1;
-        elseif strcmp(contra_ipsi, 'ipsi')
-            ic_idx = X<0 & Y>-1;
-        end
-        X = abs(X(ic_idx));
-        Y = Y(ic_idx);
-        
-        % bootstrap a new data sample and compute the slope
-        [X, sample_idx] = datasample(X, length(X), 'Replace',true);
-        Y = Y(sample_idx);
-        b = polyfit(X,Y,1);
-        slope = b(1);
-        
-    end
+%% helper functions
+
+function slope = compute_bs_slope(X, Y, contra_ipsi, pref_non)
+% cleans arm pref and modulation data, then computes the slope of their
+% relationship
+
+% select the preferred arm modulation values, then take the log of those
+% modulation values
+if strcmp(pref_non, 'pref')
+    pref_idx = sub2ind([length(X),2], (1:length(X))', (X>0)+1);
+elseif strcmp(pref_non, 'non')
+    pref_idx = sub2ind([length(X),2], (1:length(X))', (X<0)+1);
+end
+Y = log10(Y(pref_idx));
+
+% select only units that prefer the arm designated by input
+% (contra_ipsi) and remove units with small modulation, which are not
+% meaningful and would dominate the regression if not accounted for.
+if strcmp(contra_ipsi, 'contra')
+    ic_idx = X>0 & Y>-1;
+elseif strcmp(contra_ipsi, 'ipsi')
+    ic_idx = X<0 & Y>-1;
+end
+X = abs(X(ic_idx));
+Y = Y(ic_idx);
+
+% bootstrap a new data sample and compute the slope
+[X, sample_idx] = datasample(X, length(X), 'Replace',true);
+Y = Y(sample_idx);
+b = polyfit(X,Y,1);
+slope = b(1);
 
 end
+
+
 
 
 
