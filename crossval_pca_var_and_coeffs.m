@@ -76,7 +76,7 @@ if ~isempty(idx)
 end
 
 
-%% Fit the models on the eccentric configuration
+%% Fit the models on the center configuration
 
 l_hand_cen_mat = vertcat(X.cen.l_hand{:});
 r_hand_cen_mat = vertcat(X.cen.r_hand{:});
@@ -87,7 +87,7 @@ r_hand_cen_mat = vertcat(X.cen.r_hand{:});
     ~, ~] = pca(r_hand_cen_mat, 'Centered',false);
 
 
-%% test the models on the center configuration
+%% test the models on the eccentric configuration
 
 l_hand_ecc_mat = vertcat(X.ecc.l_hand{:});
 r_hand_ecc_mat = vertcat(X.ecc.r_hand{:});
